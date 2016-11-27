@@ -4,6 +4,8 @@ module.exports = {
   output: {
     path: './build',
     filename: 'cablecar.js',
+    library: 'cablecar',
+    libraryTarget: 'commonjs2'
   },
   module: {
     loaders: [{
@@ -11,6 +13,5 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader'
     }]
-  },
-  externals: [{ cablecar: true }]
+  }
 }
