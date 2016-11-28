@@ -82,11 +82,25 @@ module.exports =
 	  return function (next) {
 	    return function (action) {
 	
-	      if (action.type === 'CABLE_CAR_INITIALIZED') {
-	        car = action.car;
-	      } else if (action.type === 'DISCONNECT_CABLE_CAR') {
-	        car.unsubscribe();
-	      } else if (!action.__ActionCable) {
+	      if (action.type === 'CABLE_CAR') {
+	
+	        switch (action.msg) {
+	          case 'INITIALIZED':
+	            car = action.car;
+	            break;
+	          case 'CONNECTED':
+	            break;
+	          case 'DISCONNECTED':
+	            car = null;
+	            break;
+	          case 'DISCONNECT':
+	            car.unsubscribe();
+	            break;
+	          case 'CHANGE_CHANNEL':
+	            car.changeChannel(action.channel, action.options || {});
+	            break;
+	        }
+	      } else if (car && !action.__ActionCable) {
 	        car.send(action);
 	      }
 	
@@ -114,58 +128,11 @@ module.exports =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var CableCar = function CableCar(store, channel) {
-	  var _this = this;
-	
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
 	  _classCallCheck(this, CableCar);
 	
-	  this.initialize = function (params) {
-	    return ActionCable.createConsumer().subscriptions.create(params, {
-	      initialized: _this.initialized,
-	      connected: _this.connected,
-	      disconnected: _this.disconnected,
-	      received: _this.received,
-	      rejected: _this.rejected
-	    });
-	  };
-	
-	  this.dispatch = function (msg) {
-	    return _this.store.dispatch(Object.assign(msg, { __ActionCable: true }));
-	  };
-	
-	  this.initialized = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR_INITIALIZED', car: _this });
-	  };
-	
-	  this.connected = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR_CONNECTED' });
-	  };
-	
-	  this.disconnected = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR_DISCONNECTED' });
-	  };
-	
-	  this.received = function (msg) {
-	    return _this.dispatch(msg);
-	  };
-	
-	  this.rejected = function (data) {
-	    _this.dispatch({ type: 'CABLE_CAR_REJECTED' });
-	    throw 'Attempt to connect Redux store and ActionCable channel via CableCar failed. ' + data;
-	  };
-	
-	  this.perform = function (action, data) {
-	    return _this.subscription.perform(action, data);
-	  };
-	
-	  this.send = function (action) {
-	    return _this.subscription.send(action);
-	  };
-	
-	  this.unsubscribe = function () {
-	    return _this.subscription.unsubscribe();
-	  };
+	  _initialiseProps.call(this);
 	
 	  if (typeof ActionCable == 'undefined') {
 	    throw 'CableCar tried to connect to ActionCable but ActionCable is not defined';
@@ -184,6 +151,64 @@ module.exports =
 	
 	// ActionCable subscription functions
 	;
+	
+	var _initialiseProps = function _initialiseProps() {
+	  var _this = this;
+	
+	  this.initialize = function (params) {
+	    return ActionCable.createConsumer().subscriptions.create(params, {
+	      initialized: _this.initialized,
+	      connected: _this.connected,
+	      disconnected: _this.disconnected,
+	      received: _this.received,
+	      rejected: _this.rejected
+	    });
+	  };
+	
+	  this.changeChannel = function (channel) {
+	    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	
+	    _this.subscription.unsubscribe();
+	    _this.params = Object.assign({ channel: channel }, options);
+	    _this.subscription = _this.initialize(_this.params);
+	  };
+	
+	  this.dispatch = function (msg) {
+	    return _this.store.dispatch(Object.assign(msg, { __ActionCable: true }));
+	  };
+	
+	  this.initialized = function () {
+	    return _this.dispatch({ type: 'CABLE_CAR', msg: 'INITIALIZED', car: _this });
+	  };
+	
+	  this.connected = function () {
+	    return _this.dispatch({ type: 'CABLE_CAR', msg: 'CONNECTED' });
+	  };
+	
+	  this.disconnected = function () {
+	    return _this.dispatch({ type: 'CABLE_CAR', msg: 'DISCONNECTED' });
+	  };
+	
+	  this.received = function (msg) {
+	    return _this.dispatch(msg);
+	  };
+	
+	  this.rejected = function (data) {
+	    throw 'Attempt to connect Redux store and ActionCable channel via CableCar failed. ' + data;
+	  };
+	
+	  this.perform = function (action, data) {
+	    return _this.subscription.perform(action, data);
+	  };
+	
+	  this.send = function (action) {
+	    return _this.subscription.send(action);
+	  };
+	
+	  this.unsubscribe = function () {
+	    return _this.subscription.unsubscribe();
+	  };
+	};
 	
 	exports.default = CableCar;
 

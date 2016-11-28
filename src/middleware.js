@@ -6,11 +6,26 @@ const middleware = store => {
   
   return next => action => {
 
-    if (action.type === 'CABLE_CAR_INITIALIZED') {
-      car = action.car;
-    } else if (action.type === 'DISCONNECT_CABLE_CAR') {
-      car.unsubscribe();
-    } else if (!action.__ActionCable) {
+    if (action.type === 'CABLE_CAR') {
+      
+      switch (action.msg) {
+        case 'INITIALIZED':
+          car = action.car;
+          break;
+        case 'CONNECTED':
+          break;
+        case 'DISCONNECTED':
+          car = null;
+          break;
+        case 'DISCONNECT':
+          car.unsubscribe();
+          break;
+        case 'CHANGE_CHANNEL':
+          car.changeChannel(action.channel, action.options || {});
+          break;
+      }
+      
+    } else if (car && !action.__ActionCable) {
       car.send(action);
     }
   
