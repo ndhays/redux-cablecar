@@ -6,7 +6,7 @@ class CableCar {
       throw(`CableCar tried to connect to ActionCable but ActionCable is not defined`);
     }
 
-    this.params = Object.assign(channel, options);
+    this.params = Object.assign({ channel: channel }, options);
     this.store = store;
     this.subscription = this.initialize(this.params);
   }
