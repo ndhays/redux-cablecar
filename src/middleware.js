@@ -19,7 +19,7 @@ const middleware = store => {
   }
 };
 
-middleware.connect = (store, channel) => new CableCar(store, channel)
+middleware.connect = (store, channel, options) => new CableCar(store, channel, options)
 
 
 export default middleware
