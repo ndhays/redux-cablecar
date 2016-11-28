@@ -95,8 +95,8 @@ module.exports =
 	  };
 	};
 	
-	middleware.connect = function (store, channel) {
-	  return new _cableCar2.default(store, channel);
+	middleware.connect = function (store, channel, options) {
+	  return new _cableCar2.default(store, channel, options);
 	};
 	
 	exports.default = middleware;
@@ -116,10 +116,12 @@ module.exports =
 	var CableCar = function CableCar(store, channel) {
 	  var _this = this;
 	
+	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+	
 	  _classCallCheck(this, CableCar);
 	
-	  this.initialize = function () {
-	    return ActionCable.createConsumer().subscriptions.create({ channel: _this.channel }, {
+	  this.initialize = function (params) {
+	    return ActionCable.createConsumer().subscriptions.create(params, {
 	      initialized: _this.initialized,
 	      connected: _this.connected,
 	      disconnected: _this.disconnected,
@@ -169,9 +171,9 @@ module.exports =
 	    throw 'CableCar tried to connect to ActionCable but ActionCable is not defined';
 	  }
 	
-	  this.channel = channel;
+	  this.params = Object.assign(channel, options);
 	  this.store = store;
-	  this.subscription = this.initialize();
+	  this.subscription = this.initialize(this.params);
 	}
 	
 	// Redux dispatch function

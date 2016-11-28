@@ -1,19 +1,19 @@
 class CableCar {
 
-  constructor(store, channel) {
+  constructor(store, channel, options = {}) {
 
     if (typeof ActionCable == 'undefined') {
       throw(`CableCar tried to connect to ActionCable but ActionCable is not defined`);
     }
 
-    this.channel = channel;
+    this.params = Object.assign(channel, options);
     this.store = store;
-    this.subscription = this.initialize();
+    this.subscription = this.initialize(this.params);
   }
 
-  initialize = () => 
+  initialize = (params) => 
     
-    ActionCable.createConsumer().subscriptions.create({ channel: this.channel }, {
+    ActionCable.createConsumer().subscriptions.create(params, {
       initialized: this.initialized,
       connected: this.connected,
       disconnected: this.disconnected,
