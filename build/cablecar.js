@@ -176,7 +176,7 @@ module.exports =
 	  };
 	
 	  this.dispatch = function (msg) {
-	    return _this.store.dispatch(Object.assign(msg, { __ActionCable: true }));
+	    return _this.store.dispatch(Object.assign(msg, { ActionCable__flag: true }));
 	  };
 	
 	  this.initialized = function () {
