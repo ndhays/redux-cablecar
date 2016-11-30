@@ -54,8 +54,11 @@ class CableCar {
 
   received = msg => this.dispatch(msg)
 
-  rejected = (data) => {
-    throw new Error(`Attempt to connect Redux store and ActionCable channel via CableCar failed. ${data}`);
+  rejected = () => {
+    throw new Error(
+      `CableCar: Attempt to connect was rejected.
+      (Channel: ${this.channel})`,
+    );
   }
 
   // ActionCable subscription functions (exposed globally)
