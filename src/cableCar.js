@@ -29,7 +29,7 @@ class CableCar {
   }
 
   // Redux dispatch function
-  dispatch = msg => this.store.dispatch(Object.assign(msg, { __ActionCable: true }))
+  dispatch = msg => this.store.dispatch(Object.assign(msg, { ActionCable__flag: true }))
 
   // ActionCable callback functions
   initialized = () => this.dispatch({ type: 'CABLE_CAR_INITIALIZED', car: this })
