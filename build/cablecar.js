@@ -75,36 +75,36 @@ module.exports =
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	var car = void 0;
+	
 	var middleware = function middleware(store) {
-	
-	  var car;
-	
 	  return function (next) {
 	    return function (action) {
+	      switch (action.type) {
+	        case 'CABLE_CAR_INITIALIZED':
+	          car = action.car;
+	          break;
+	        // case 'CABLE_CAR_CONNECTED':
+	        //   break;
+	        case 'CABLE_CAR_DISCONNECTED':
+	          car = null;
+	          break;
+	        case 'CABLE_CAR_DISCONNECT':
+	          car.unsubscribe();
+	          car.disconnected();
+	          break;
+	        case 'CABLE_CAR_CHANGE_CHANNEL':
+	          car.changeChannel(action.channel, action.options || {});
+	          break;
+	        default:
+	          break;
+	      }
 	
-	      if (action.type === 'CABLE_CAR') {
-	
-	        switch (action.msg) {
-	          case 'INITIALIZED':
-	            car = action.car;
-	            break;
-	          case 'CONNECTED':
-	            break;
-	          case 'DISCONNECTED':
-	            car = null;
-	            break;
-	          case 'DISCONNECT':
-	            car.unsubscribe();
-	            break;
-	          case 'CHANGE_CHANNEL':
-	            car.changeChannel(action.channel, action.options || {});
-	            break;
-	        }
-	      } else if (car && !action.__ActionCable) {
+	      if (car && !action.ActionCable__flag) {
 	        car.send(action);
 	      }
 	
-	      return action.optimistic || action.__ActionCable ? next(action) : store.getState();
+	      return action.optimistic || action.ActionCable__flag ? next(action) : store.getState();
 	    };
 	  };
 	};
@@ -127,6 +127,8 @@ module.exports =
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
+	/* global ActionCable */
+	
 	var CableCar = function CableCar(store, channel) {
 	  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 	
@@ -134,8 +136,8 @@ module.exports =
 	
 	  _initialiseProps.call(this);
 	
-	  if (typeof ActionCable == 'undefined') {
-	    throw 'CableCar tried to connect to ActionCable but ActionCable is not defined';
+	  if (typeof ActionCable === 'undefined') {
+	    throw new Error('CableCar tried to connect to ActionCable but ActionCable is not defined');
 	  }
 	
 	  this.params = Object.assign({ channel: channel }, options);
@@ -149,7 +151,7 @@ module.exports =
 	// ActionCable callback functions
 	
 	
-	// ActionCable subscription functions
+	// ActionCable subscription functions (exposed globally)
 	;
 	
 	var _initialiseProps = function _initialiseProps() {
@@ -178,15 +180,15 @@ module.exports =
 	  };
 	
 	  this.initialized = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR', msg: 'INITIALIZED', car: _this });
+	    return _this.dispatch({ type: 'CABLE_CAR_INITIALIZED', car: _this });
 	  };
 	
 	  this.connected = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR', msg: 'CONNECTED' });
+	    return _this.dispatch({ type: 'CABLE_CAR_CONNECTED' });
 	  };
 	
 	  this.disconnected = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR', msg: 'DISCONNECTED' });
+	    return _this.dispatch({ type: 'CABLE_CAR_DISCONNECTED' });
 	  };
 	
 	  this.received = function (msg) {
@@ -194,7 +196,7 @@ module.exports =
 	  };
 	
 	  this.rejected = function (data) {
-	    throw 'Attempt to connect Redux store and ActionCable channel via CableCar failed. ' + data;
+	    throw new Error('Attempt to connect Redux store and ActionCable channel via CableCar failed. ' + data);
 	  };
 	
 	  this.perform = function (action, data) {
