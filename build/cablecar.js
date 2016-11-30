@@ -213,8 +213,8 @@ module.exports =
 	    return _this.dispatch(msg);
 	  };
 	
-	  this.rejected = function (data) {
-	    throw new Error('Attempt to connect Redux store and ActionCable channel via CableCar failed. ' + data);
+	  this.rejected = function () {
+	    throw new Error('CableCar: Attempt to connect was rejected.\n      (Channel: ' + _this.channel + ')');
 	  };
 	
 	  this.perform = function (action, data) {
