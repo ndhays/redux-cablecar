@@ -1,49 +1,51 @@
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
+/* global describe, it */
+
 import chai from 'chai';
 import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
-chai.use(sinonChai);
-
-
 
 import CableCar from '../src/cableCar';
 
+chai.use(sinonChai);
+
 
 describe('CableCar', () => {
-  
   const mockCreateFunc = sinon.stub();
   global.ActionCable = {
-    createConsumer: () => { return { subscriptions: { create: mockCreateFunc } }}
+    createConsumer: () => ({ subscriptions: { create: mockCreateFunc } }),
   };
 
   const mockStore = { dispatch: sinon.spy() };
-  
-  
+
+
   describe('when ActionCable is undefined', () => {
     it('throws a descriptive error', () => {
-      let ac = global.ActionCable;
+      const ac = global.ActionCable;
       global.ActionCable = undefined;
-      var fn = () => { return new CableCar('channel', mockStore) };
+      const fn = () => new CableCar('channel', mockStore);
       chai.expect(fn).to.throw('CableCar tried to connect to ActionCable but ActionCable is not defined');
       global.ActionCable = ac;
     });
   });
-  
+
   describe('constructor', () => {
-    it('sets the channel', () => {
-      let cc = new CableCar('channel', mockStore);
-      chai.expect(cc.channel).to.eq('channel');
+    it('sets the channel and options', () => {
+      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
+      chai.expect(cc.params.channel).to.eq('channel');
+      chai.expect(cc.params.opt1).to.eq(5);
     });
-    
+
     it('sets the store', () => {
-      let cc = new CableCar('channel', mockStore);
+      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
       chai.expect(cc.store).to.eq(mockStore);
     });
   });
-  
+
   describe('#initialize', () => {
     it('creates an ActionCable subscription with proper args', () => {
-      let cc = new CableCar('channel', mockStore);
-      chai.expect(mockCreateFunc).to.have.been.calledWith({ channel: 'channel' }, {
+      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
+      chai.expect(mockCreateFunc).to.have.been.calledWith({ channel: 'channel', opt1: 5 }, {
         initialized: cc.initialized,
         connected: cc.connected,
         disconnected: cc.disconnected,
@@ -52,5 +54,4 @@ describe('CableCar', () => {
       });
     });
   });
-
 });
