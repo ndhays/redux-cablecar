@@ -76,31 +76,33 @@ module.exports =
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var car = void 0;
+	var connected = false;
 	
 	var middleware = function middleware(store) {
 	  return function (next) {
 	    return function (action) {
 	      switch (action.type) {
-	        case 'CABLE_CAR_INITIALIZED':
+	        case 'CABLECAR_INITIALIZED':
 	          car = action.car;
 	          break;
-	        // case 'CABLE_CAR_CONNECTED':
-	        //   break;
-	        case 'CABLE_CAR_DISCONNECTED':
+	        case 'CABLECAR_CONNECTED':
+	          connected = true;
+	          break;
+	        case 'CABLECAR_DISCONNECTED':
+	          connected = false;
+	          break;
+	        case 'CABLECAR_DISCONNECT':
+	          car.unsubscribe();
 	          car = null;
 	          break;
-	        case 'CABLE_CAR_DISCONNECT':
-	          car.unsubscribe();
-	          car.disconnected();
-	          break;
-	        case 'CABLE_CAR_CHANGE_CHANNEL':
+	        case 'CABLECAR_CHANGE_CHANNEL':
 	          car.changeChannel(action.channel, action.options || {});
 	          break;
 	        default:
 	          break;
 	      }
 	
-	      if (car && !action.ActionCable__flag) {
+	      if (connected && !action.ActionCable__flag) {
 	        car.send(action);
 	      }
 	
@@ -125,6 +127,8 @@ module.exports =
 	  value: true
 	});
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	/* global ActionCable */
@@ -140,9 +144,8 @@ module.exports =
 	    throw new Error('CableCar tried to connect to ActionCable but ActionCable is not defined');
 	  }
 	
-	  this.params = Object.assign({ channel: channel }, options);
 	  this.store = store;
-	  this.subscription = this.initialize(this.params);
+	  this.initialize(channel, options);
 	}
 	
 	// Redux dispatch function
@@ -157,8 +160,13 @@ module.exports =
 	var _initialiseProps = function _initialiseProps() {
 	  var _this = this;
 	
-	  this.initialize = function (params) {
-	    return ActionCable.createConsumer().subscriptions.create(params, {
+	  this.initialize = function (channel, options) {
+	    _this.channel = channel;
+	    _this.options = options;
+	
+	    var params = Object.assign({ channel: channel }, options);
+	
+	    _this.subscription = ActionCable.createConsumer().subscriptions.create(params, {
 	      initialized: _this.initialized,
 	      connected: _this.connected,
 	      disconnected: _this.disconnected,
@@ -170,25 +178,35 @@ module.exports =
 	  this.changeChannel = function (channel) {
 	    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-	    _this.subscription.unsubscribe();
-	    _this.params = Object.assign({ channel: channel }, options);
-	    _this.subscription = _this.initialize(_this.params);
+	    _this.unsubscribe();
+	    _this.initialize(channel, options);
 	  };
 	
 	  this.dispatch = function (msg) {
-	    return _this.store.dispatch(Object.assign(msg, { ActionCable__flag: true }));
+	    var action = (typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object' ? msg : _this.formatAction(msg);
+	    action = Object.assign(action, { ActionCable__flag: true });
+	    _this.store.dispatch(action);
+	  };
+	
+	  this.formatAction = function (msg) {
+	    return {
+	      type: msg,
+	      car: _this,
+	      channel: _this.channel,
+	      options: _this.options
+	    };
 	  };
 	
 	  this.initialized = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR_INITIALIZED', car: _this });
+	    return _this.dispatch('CABLECAR_INITIALIZED');
 	  };
 	
 	  this.connected = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR_CONNECTED' });
+	    return _this.dispatch('CABLECAR_CONNECTED');
 	  };
 	
 	  this.disconnected = function () {
-	    return _this.dispatch({ type: 'CABLE_CAR_DISCONNECTED' });
+	    return _this.dispatch('CABLECAR_DISCONNECTED');
 	  };
 	
 	  this.received = function (msg) {
@@ -208,7 +226,8 @@ module.exports =
 	  };
 	
 	  this.unsubscribe = function () {
-	    return _this.subscription.unsubscribe();
+	    _this.subscription.unsubscribe();
+	    _this.disconnected();
 	  };
 	};
 	

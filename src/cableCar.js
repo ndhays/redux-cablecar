@@ -7,36 +7,50 @@ class CableCar {
       throw new Error('CableCar tried to connect to ActionCable but ActionCable is not defined');
     }
 
-    this.params = Object.assign({ channel }, options);
     this.store = store;
-    this.subscription = this.initialize(this.params);
+    this.initialize(channel, options);
   }
 
-  initialize = params =>
+  initialize = (channel, options) => {
+    this.channel = channel;
+    this.options = options;
 
-    ActionCable.createConsumer().subscriptions.create(params, {
+    const params = Object.assign({ channel }, options);
+
+    this.subscription = ActionCable.createConsumer().subscriptions.create(params, {
       initialized: this.initialized,
       connected: this.connected,
       disconnected: this.disconnected,
       received: this.received,
       rejected: this.rejected,
-    })
+    });
+  }
 
   changeChannel = (channel, options = {}) => {
-    this.subscription.unsubscribe();
-    this.params = Object.assign({ channel }, options);
-    this.subscription = this.initialize(this.params);
+    this.unsubscribe();
+    this.initialize(channel, options);
   }
 
   // Redux dispatch function
-  dispatch = msg => this.store.dispatch(Object.assign(msg, { ActionCable__flag: true }))
+  dispatch = (msg) => {
+    let action = typeof msg === 'object' ? msg : this.formatAction(msg);
+    action = Object.assign(action, { ActionCable__flag: true });
+    this.store.dispatch(action);
+  }
+
+  formatAction = msg => ({
+    type: msg,
+    car: this,
+    channel: this.channel,
+    options: this.options,
+  })
 
   // ActionCable callback functions
-  initialized = () => this.dispatch({ type: 'CABLE_CAR_INITIALIZED', car: this })
+  initialized = () => this.dispatch('CABLECAR_INITIALIZED')
 
-  connected = () => this.dispatch({ type: 'CABLE_CAR_CONNECTED' })
+  connected = () => this.dispatch('CABLECAR_CONNECTED')
 
-  disconnected = () => this.dispatch({ type: 'CABLE_CAR_DISCONNECTED' })
+  disconnected = () => this.dispatch('CABLECAR_DISCONNECTED')
 
   received = msg => this.dispatch(msg)
 
@@ -49,8 +63,10 @@ class CableCar {
 
   send = action => this.subscription.send(action)
 
-  unsubscribe = () => this.subscription.unsubscribe()
-
+  unsubscribe = () => {
+    this.subscription.unsubscribe();
+    this.disconnected();
+  }
 }
 
 
