@@ -91,16 +91,14 @@ Actions originating on the client bypass Redux by default, however if `optimisti
 
 `--> CLIENT dispatches action --> middleware sends it on to both --> CLIENT & SERVER`
 
-## CableCar Object
+## CableCar Object functions
 
-These CableCar object functions have action equivalents, listed above, and are better achieved by dispatching an action (ie. use `"CABLECAR_DISCONNECT"` instead of `car.unsubscribe()`)
+These functions are available as well.
 
-`#perform` - calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
+`#perform` - calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))  
 
-`#send` - sends a direct message to ActionCable (bypassing middleware)
+`#send` - sends a direct message to ActionCable (bypassing middleware)  
 
-Other functions available
-`#unsubscribe` - unsubscribes from the channel
 
 ## License
 
