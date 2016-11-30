@@ -1,29 +1,31 @@
 import CableCar from './cableCar';
 
 let car;
+let connected = false;
 
 const middleware = store => next => (action) => {
   switch (action.type) {
-    case 'CABLE_CAR_INITIALIZED':
+    case 'CABLECAR_INITIALIZED':
       car = action.car;
       break;
-    // case 'CABLE_CAR_CONNECTED':
-    //   break;
-    case 'CABLE_CAR_DISCONNECTED':
+    case 'CABLECAR_CONNECTED':
+      connected = true;
+      break;
+    case 'CABLECAR_DISCONNECTED':
+      connected = false;
+      break;
+    case 'CABLECAR_DISCONNECT':
+      car.unsubscribe();
       car = null;
       break;
-    case 'CABLE_CAR_DISCONNECT':
-      car.unsubscribe();
-      car.disconnected();
-      break;
-    case 'CABLE_CAR_CHANGE_CHANNEL':
+    case 'CABLECAR_CHANGE_CHANNEL':
       car.changeChannel(action.channel, action.options || {});
       break;
     default:
       break;
   }
 
-  if (car && !action.ActionCable__flag) {
+  if (connected && !action.ActionCable__flag) {
     car.send(action);
   }
 

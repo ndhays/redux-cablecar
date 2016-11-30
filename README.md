@@ -57,8 +57,8 @@ This function returns a `CableCar` object.
 `CABLECAR_DISCONNECTED`
 
 ###### Actions that can be sent to middleware:
-`CABLECAR_DISCONNECT`  
-
+`CABLECAR_DISCONNECT` - this action destroys the CableCar object  
+( to reconnect use `cablecar#connect` )  
 `CABLECAR_CHANGE_CHANNEL` - this action takes `channel` and `options` properties
 
 **Example:**  
@@ -73,7 +73,7 @@ ChatChannel.broadcast_to(
 )
 ```
 
-This example would send subscribers from the `green` chat room to the `blue` chat room (with a "chat_blue" stream name), keeping them on the same `ChatChannel`.
+This example would send subscribers from the `green` chat room to the `blue` chat room (with a "chat_blue" stream name), while keeping them on the same `ChatChannel`.
 
 ## Flow
 ###### Broadcasts
