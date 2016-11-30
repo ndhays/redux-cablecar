@@ -1,4 +1,4 @@
-import CableCar from './cableCar';
+import CableCar from './CableCar';
 
 let car;
 let connected = false;
