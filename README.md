@@ -1,6 +1,8 @@
 # CableCar (redux-cablecar)
 
-An npm package to connect [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html) to [Redux](http://redux.js.org/).
+An npm package to connect [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html) to [Redux](http://redux.js.org/).  
+
+To explore, clone repo and run `yarn`.
 
 #### Middleware
 CableCar works as [Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html).
