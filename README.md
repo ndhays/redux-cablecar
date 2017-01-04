@@ -34,8 +34,6 @@ class ChatChannel < ApplicationCable::Channel
 end
 ```
 
-## cablecar methods
-
 **#connect**
 
 This function takes three parameters: `store`, `channel`, and `options`
