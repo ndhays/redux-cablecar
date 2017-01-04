@@ -43,6 +43,28 @@ This function takes three parameters: `store`, `channel`, and `options`
 (`options` becomes `params` in the Rails ActionCable channel)
 
 This function returns a `CableCar` object.
+  
+`perform`  
+Calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
+  
+This function takes two parameters: `method` and `payload`
+  
+**Perform Example:**
+```rubyonrails
+class ChatChannel < ApplicationCable::Channel
+  def subscribed
+    stream_from "chat"
+  end
+
+  def activate(data)
+    do_something_to_activate(with: data)
+  end
+end
+```
+```js6
+const car = cablecar.connect(store, ... )
+car.perform('activate', { data: ... })
+```
 
 ## Defined Actions
 ###### Actions fired by middleware:
@@ -65,27 +87,6 @@ ChatChannel.broadcast_to(
 ```
 
 This example sends subscribers from the `green` chat room to the `blue` chat room while remaining on `ChatChannel`.
-
-## #perform
-
-`#perform` - calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))  
-
-**Perform Example:**
-```rubyonrails
-class ChatChannel < ApplicationCable::Channel
-  def subscribed
-    stream_from "chat"
-  end
-
-  def activate(data)
-    do_something_to_activate(with: data)
-  end
-end
-```
-```js6
-const car = cablecar.connect(store, ... )
-car.perform('activate', { data: ... })
-```
 
 # Broadcast & Dispatch Flow
 ##### Broadcasts
