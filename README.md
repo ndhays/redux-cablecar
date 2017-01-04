@@ -34,7 +34,7 @@ class ChatChannel < ApplicationCable::Channel
 end
 ```
 
-## `cablecar`
+## cablecar methods
 
 **#connect**
 
