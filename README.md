@@ -57,8 +57,8 @@ class ChatChannel < ApplicationCable::Channel
     stream_from "chat"
   end
 
-  def activate(data)
-    do_something_to_activate(with: data)
+  def activate(payload)
+    do_something_to_activate(with: payload["data"])
   end
 end
 ```
