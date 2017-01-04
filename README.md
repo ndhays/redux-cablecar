@@ -49,7 +49,7 @@ This function returns a `CableCar` object.
 `CABLECAR_INITIALIZED`, `CABLECAR_CONNECTED`, `CABLECAR_DISCONNECTED`
 
 ###### Actions received by middleware:
-`CABLECAR_DISCONNECT` - destroys the websocket connection and the `CableCar` object
+`CABLECAR_DISCONNECT` - destroys the websocket connection and the `CableCar` object  
 `CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel (takes `channel` and `options` properties)
 
 **Example:**  
