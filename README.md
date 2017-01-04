@@ -13,7 +13,7 @@ Uses [yarn](https://yarnpkg.com) as a package manager.
 1. Add `cablecar` to list of middleware
 2. Connect the redux store to cablecar
 
-Client Example:
+**Client Example:**
 ```js6
 import { createStore, applyMiddleware } from 'redux';
 import reducer from './reducers/rootReducer';
@@ -25,7 +25,7 @@ cablecar.connect(store, 'ChatChannel', { room: 'game' })
 ```
 This connects the Redux store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
   
-Server Example:
+**Server Example:**
 ```rubyonrails
 class ChatChannel < ApplicationCable::Channel
   def subscribed
@@ -52,7 +52,7 @@ This function returns a `CableCar` object.
 `CABLECAR_DISCONNECT` - destroys the websocket connection and the `CableCar` object  
 `CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel (takes `channel` and `options` properties)
 
-**Example:**  
+**Change Channel Example:**  
 ```rubyonrails
 ChatChannel.broadcast_to(
   "chat_green",
