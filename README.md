@@ -23,7 +23,7 @@ const store = createStore(reducer, applyMiddleware(cablecar...));
 
 cablecar.connect(store, 'ChatChannel', { room: 'game' })
 ```
-This creates a link between Redux and the ActionCable subscription to `ChatChannel` with `params[:room] = "game"`.  
+This connects the Redux store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
   
 Example:
 ```rubyonrails
