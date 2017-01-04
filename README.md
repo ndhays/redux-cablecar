@@ -36,7 +36,7 @@ end
 
 ## `cablecar`
 
-`#connect`
+**#connect**
 
 This function takes three parameters: `store`, `channel`, and `options`
 
@@ -44,7 +44,8 @@ This function takes three parameters: `store`, `channel`, and `options`
 
 This function returns a `CableCar` object.
   
-`perform`  
+**#perform**
+  
 Calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
   
 This function takes two parameters: `method` and `payload`
