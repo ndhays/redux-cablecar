@@ -74,11 +74,11 @@ describe('CableCar', () => {
   });
 
   describe('#dispatch', () => {
-    it('adds an ActionCable flag', () => {
+    it('adds an flag.. CableCar is false', () => {
       const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
       cc.dispatch({});
       expect(mockStore.dispatch).to.have.been.calledWith({
-        ActionCable__flag: true,
+        CableCar: false,
       });
     });
     describe('when msg passed is an object', () => {
@@ -87,7 +87,7 @@ describe('CableCar', () => {
         cc.dispatch({ type: 'testmsg' });
         expect(mockStore.dispatch).to.have.been.calledWith({
           type: 'testmsg',
-          ActionCable__flag: true,
+          CableCar: false,
         });
       });
     });
@@ -98,7 +98,7 @@ describe('CableCar', () => {
         cc.dispatch('testmsg');
         expect(mockStore.dispatch).to.have.been.calledWith({
           a: 'action34',
-          ActionCable__flag: true,
+          CableCar: false,
         });
       });
     });

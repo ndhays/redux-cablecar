@@ -34,7 +34,7 @@ class CableCar {
   // Redux dispatch function
   dispatch = (msg) => {
     let action = typeof msg === 'object' ? msg : this.formatAction(msg);
-    action = Object.assign(action, { ActionCable__flag: true });
+    action = Object.assign(action, { CableCar: false });
     this.store.dispatch(action);
   }
 

@@ -1,4 +1,4 @@
-import CableCar from './CableCar';
+import CableCar from './cableCar';
 
 let car;
 let connected = false;
@@ -25,11 +25,13 @@ const middleware = store => next => (action) => {
       break;
   }
 
-  if (connected && !action.ActionCable__flag) {
+  if (connected && (action.CableCar !== false)) {
     car.send(action);
   }
 
-  return (action.optimistic || action.ActionCable__flag ? next(action) : store.getState());
+  const propagate = action.CableCarOptimistic || (action.CableCar === false);
+
+  return (propagate ? next(action) : store.getState());
 };
 
 middleware.connect = (store, channel, options) => new CableCar(store, channel, options);

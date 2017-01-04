@@ -36,14 +36,14 @@ describe('cablecar middleware', () => {
     describe('when action is optimistic (and not flagged)', () => {
       it('gets passed on to redux', () => {
         expect(store.getState().value).to.eq(0);
-        store.dispatch({ type: 'GO', value: 10, optimistic: true });
+        store.dispatch({ type: 'GO', value: 10, CableCarOptimistic: true });
         expect(store.getState().value).to.eq(10);
       });
     });
-    describe('when action is flagged (but not optimistic)', () => {
+    describe('when CableCar is set to false (but not optimistic)', () => {
       it('gets passed on to redux', () => {
         expect(store.getState().value).to.eq(0);
-        store.dispatch({ type: 'GO', value: 10, ActionCable__flag: true });
+        store.dispatch({ type: 'GO', value: 10, CableCar: false });
         expect(store.getState().value).to.eq(10);
       });
     });
