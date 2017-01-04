@@ -62,7 +62,7 @@ class CableCar {
   }
 
   // ActionCable subscription functions (exposed globally)
-  perform = (action, data) => this.subscription.perform(action, data)
+  perform = (method, payload) => this.subscription.perform(method, payload)
 
   send = action => this.subscription.send(action)
 
