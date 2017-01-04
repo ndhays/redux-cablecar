@@ -66,29 +66,6 @@ ChatChannel.broadcast_to(
 
 This example sends subscribers from the `green` chat room to the `blue` chat room while remaining on `ChatChannel`.
 
-## Broadcast & Dispatch Flow
-###### Broadcasts
-Actions 'broadcasted' from Rails are then dispatched to Redux on the client
-
-`--> SERVER broadcasts message --> middleware passes it on --> CLIENT`
-
-###### Dispatches
-Actions originating on the client are sent to an ActionCable channel
-
-`--> CLIENT dispatches action --> middleware sends it on --> SERVER`
-
-###### Optimistic Dispatches (how it works)
-Actions originating on the client do not get sent to the reducers.  
-
-Broadcasted messages from the server don't get re-dispatched right back to the server.  
-
-This creates a circular message flow between the client (Redux) and the server (ActionCable).  
-
-However if `optimistic: true` is in the action then the action will be sent to both the Rails Server, *and* the client's Redux reducers. These are considered 'optimistic' updates since when news comes back from the server it may conflict with what the client has already done. *Use with caution!*
-
-**optimistic action:**  
-`--> CLIENT dispatches action --> middleware sends it to the server (in addition to the next middleware) simultaneously --> CLIENT & SERVER`
-
 ## #perform
 
 This function is also available on the CableCar object.
@@ -111,6 +88,29 @@ end
 const car = cablecar.connect(store, ... )
 car.perform("activate", { data: ... })
 ```
+
+# Broadcast & Dispatch Flow
+##### Broadcasts
+Actions 'broadcasted' from Rails are then dispatched to Redux on the client
+
+`--> SERVER broadcasts message --> middleware passes it on --> CLIENT`
+
+##### Dispatches
+Actions originating on the client are sent to an ActionCable channel
+
+`--> CLIENT dispatches action --> middleware sends it on --> SERVER`
+
+##### Optimistic Dispatches (how it works)
+Actions originating on the client do not get sent to the reducers.  
+
+Broadcasted messages from the server don't get re-dispatched right back to the server.  
+
+This creates a circular message flow between the client (Redux) and the server (ActionCable).  
+
+However if `optimistic: true` is in the action then the action will be sent to both the Rails Server, *and* the client's Redux reducers. These are considered 'optimistic' updates since when news comes back from the server it may conflict with what the client has already done. *Use with caution!*
+
+**optimistic action:**  
+`--> CLIENT dispatches action --> middleware sends it to the server (in addition to the next middleware) simultaneously --> CLIENT & SERVER`
 
 ## License
 
