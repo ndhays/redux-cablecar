@@ -68,11 +68,9 @@ This example sends subscribers from the `green` chat room to the `blue` chat roo
 
 ## #perform
 
-This function is also available on the CableCar object.
-
 `#perform` - calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))  
 
-Example:
+**Perform Example:**
 ```rubyonrails
 class ChatChannel < ApplicationCable::Channel
   def subscribed
@@ -86,7 +84,7 @@ end
 ```
 ```js6
 const car = cablecar.connect(store, ... )
-car.perform("activate", { data: ... })
+car.perform('activate', { data: ... })
 ```
 
 # Broadcast & Dispatch Flow
