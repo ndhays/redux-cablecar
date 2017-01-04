@@ -36,11 +36,11 @@ end
 
 ## `cablecar`
 
-`#connect` - connects cablecar to a Redux store
+`#connect`
 
 This function takes three parameters: `store`, `channel`, and `options`
 
-(`options` get passed as `params` to the Rails ActionCable channel)
+(`options` becomes `params` in the Rails ActionCable channel)
 
 This function returns a `CableCar` object.
 
