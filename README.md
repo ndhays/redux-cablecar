@@ -24,7 +24,7 @@ const store = createStore(reducer, applyMiddleware(cablecar...));
 cablecar.connect(store, 'ChatChannel', { room: 'game' })
 ```
 This connects the Redux store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
-  
+
 **Server Example:**
 ```rubyonrails
 class ChatChannel < ApplicationCable::Channel
@@ -41,13 +41,13 @@ This function takes three parameters: `store`, `channel`, and `options`
 (`options` becomes `params` in the Rails ActionCable channel)
 
 This function returns a `CableCar` object.
-  
+
 **#perform**
-  
+
 Calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
-  
+
 This function takes two parameters: `method` and `payload`
-  
+
 **Perform Example:**
 ```rubyonrails
 class ChatChannel < ApplicationCable::Channel
@@ -98,17 +98,20 @@ Actions originating on the client are sent to an ActionCable channel
 
 `--> CLIENT dispatches action --> middleware sends it on --> SERVER`
 
-##### Optimistic Dispatches (how it works)
+##### Optimistic Dispatches
 Actions originating on the client do not get sent to the reducers.  
 
 Broadcasted messages from the server don't get re-dispatched right back to the server.  
 
 This creates a circular message flow between the client (Redux) and the server (ActionCable).  
 
-However if `optimistic: true` is in the action then the action will be sent to both the Rails Server, *and* the client's Redux reducers. These are considered 'optimistic' updates since when news comes back from the server it may conflict with what the client has already done. *Use with caution!*
+However if `CableCarOtimistic: true` is in the action then the action will be sent to both the Rails Server, *and* on thru the Redux middlewares. These are considered 'optimistic' updates since when news comes back from the server it may conflict with what the client has already done. *Use with caution!*
 
 **optimistic action:**  
 `--> CLIENT dispatches action --> middleware sends it to the server (in addition to the next middleware) simultaneously --> CLIENT & SERVER`
+
+##### Dispatch Redux Actions (w/o sending to ActionCable)
+If `CableCar` is set to `false` in the action it *will* pass the action on thru the Redux middleware and will *not* send the action thru the ActionCable websocket connection to Rails.
 
 ## License
 
