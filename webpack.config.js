@@ -1,9 +1,7 @@
 module.exports = {
-  devtool: 'source-map',
   entry: './index.js',
   output: {
     path: './build',
-    filename: 'cablecar.js',
     library: 'cablecar',
     libraryTarget: 'commonjs2',
   },

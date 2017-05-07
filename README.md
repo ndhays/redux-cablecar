@@ -2,18 +2,21 @@
 
 [Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
 
-It creates a websocket connection and a circular message flow from the client to the server.
-
-Uses [yarn](https://yarnpkg.com) as a package manager.
+Uses a websocket connection to create a circular message flow between the client and the server.
 
 # Installation
-`yarn add redux-cablecar`
+`npm install redux-cablecar --save`
 
 # Usage
-1. Add `cablecar` to list of middleware
+1. Add `cablecar` to the list of middlewares
 2. Connect the redux store to cablecar
 
-**Client Example:**
+## #connect(store, channel, options)
+Connects the store to the ActionCable channel.  
+Returns a `CableCar` object.
+
+### Example:
+**Client-side: (Redux)**
 ```js6
 import { createStore, applyMiddleware } from 'redux';
 import reducer from './reducers/rootReducer';
@@ -21,11 +24,11 @@ import cablecar from 'redux-cablecar';
 
 const store = createStore(reducer, applyMiddleware(cablecar...));
 
-cablecar.connect(store, 'ChatChannel', { room: 'game' })
+cablecar.connect(store, 'ChatChannel', { params: { room: 'game' }, prefix: 'RAILS' });
 ```
-This connects the Redux store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
+This example connects the store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`. (Only actions with types beginning with "RAILS" will be sent).  
 
-**Server Example:**
+**Server-side: (Rails)**
 ```rubyonrails
 class ChatChannel < ApplicationCable::Channel
   def subscribed
@@ -33,22 +36,29 @@ class ChatChannel < ApplicationCable::Channel
   end
 end
 ```
+#### store (*required* object)
+Redux store object.
+#### channel (*required* string)
+Name of the ActionCable channel.
+#### options (*optional* object)
+**Options:**  
+`connected` - function, *optional*, callback function  
+`disconnected` - function, *optional*, callback function
+`params` - object, *optional*, params sent to Rails
+`prefix` - string, *optional*, *default:* `'CABLECAR'`, used to filter out CableCar actions from non-CableCar actions.  
+Actions are only dispatched to the server if they match the given prefix.  
+For example, if `prefix` is set to `'MSG'`:  
+`MSG_ONE_GETS_SENT`, `MESSAGE_TWO_DOES_NOT`  
+(To pass all messages to CableCar, use prefix: `''`).
 
-**#connect**
+## #perform(method, payload)
+Calls a method in Rails. (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
 
-This function takes three parameters: `store`, `channel`, and `options`
-
-(`options` becomes `params` in the Rails ActionCable channel)
-
-This function returns a `CableCar` object.
-
-**#perform**
-
-Calls a method directly in Rails (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
-
-This function takes two parameters: `method` and `payload`
-
-**Perform Example:**
+**Example:**
+```js6
+const car = cablecar.connect(store, ... )
+car.perform('activate', { data: ... })
+```
 ```rubyonrails
 class ChatChannel < ApplicationCable::Channel
   def subscribed
@@ -60,18 +70,16 @@ class ChatChannel < ApplicationCable::Channel
   end
 end
 ```
-```js6
-const car = cablecar.connect(store, ... )
-car.perform('activate', { data: ... })
-```
 
 ## Defined Actions
-###### Actions fired by middleware:
+###### Reserved action types fired by CableCar middleware:
 `CABLECAR_INITIALIZED`, `CABLECAR_CONNECTED`, `CABLECAR_DISCONNECTED`
 
-###### Actions received by middleware:
-`CABLECAR_DISCONNECT` - destroys the websocket connection and the `CableCar` object  
-`CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel (takes `channel` and `options` properties)
+###### Other reserved action types:
+`CABLECAR_DESTROY` - destroys the websocket connection and the `CableCar`
+  object (Now all actions will work as normal)
+`CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel  
+These actions can be sent from ActionCable or dispatched in Redux.  
 
 **Change Channel Example:**  
 ```rubyonrails
@@ -80,38 +88,35 @@ ChatChannel.broadcast_to(
   type: 'CABLECAR_CHANGE_CHANNEL',
   channel: 'ChatChannel',
   options: {
-    room: 'blue'
+    params: { room: 'blue' }
   }
 )
 ```
 
-This example sends subscribers from the `green` chat room to the `blue` chat room while remaining on `ChatChannel`.
+This example sends subscribers from the `green` chat room to the `blue` chat room while remaining on `ChatChannel`. (If no new prefix is given, it will use the old one).
 
 # Broadcast & Dispatch Flow
-##### Broadcasts
-Actions 'broadcasted' from Rails are then dispatched to Redux on the client
+#### Broadcasts
+Actions broadcasted from Rails are dispatched to Redux:
 
-`--> SERVER broadcasts message --> middleware passes it on --> CLIENT`
+`--> SERVER broadcasts message --> middleware --> CLIENT`
 
-##### Dispatches
-Actions originating on the client are sent to an ActionCable channel
+#### Dispatches
+Actions originating on the client are sent to an ActionCable channel:
 
-`--> CLIENT dispatches action --> middleware sends it on --> SERVER`
+`--> CLIENT dispatches action --> middleware --> SERVER`
 
-##### Optimistic Dispatches
-Actions originating on the client do not get sent to the reducers.  
+#### Optimistic Dispatches
+Actions originating on the client *by default* are stopped before going to the reducers.
 
-Broadcasted messages from the server don't get re-dispatched right back to the server.  
+Broadcasted messages from the server also don't get re-dispatched back to the server (in an infinite loop).  
 
 This creates a circular message flow between the client (Redux) and the server (ActionCable).  
 
-However if `CableCarOtimistic: true` is in the action then the action will be sent to both the Rails Server, *and* on thru the Redux middlewares. These are considered 'optimistic' updates since when news comes back from the server it may conflict with what the client has already done. *Use with caution!*
+However if `CableCarOptimistic: true` is in the action payload, then the action will be sent to both the Rails Server, in addition to being propagated up thru the Redux middlewares. These actions are considered 'optimistic' updates since when news comes back from the server it may conflict with changes that have already been made on the client. *Caution!*
 
 **optimistic action:**  
-`--> CLIENT dispatches action --> middleware sends it to the server (in addition to the next middleware) simultaneously --> CLIENT & SERVER`
-
-##### Dispatch Redux Actions (w/o sending to ActionCable)
-If `CableCar` is set to `false` in the action it *will* pass the action on thru the Redux middleware and will *not* send the action thru the ActionCable websocket connection to Rails.
+`--> CLIENT dispatches action --> middleware --> server AND next middlewares/reducers`
 
 ## License
 
