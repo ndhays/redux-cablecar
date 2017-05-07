@@ -80,7 +80,7 @@ end
 
 ###### Other reserved action types:
 `CABLECAR_DESTROY` - destroys the websocket connection and the `CableCar`
-  object (now all actions will run through redux middleware as normal)
+  object (now all actions will run through redux middleware as normal)  
 `CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel  
 These actions can be sent from ActionCable or dispatched in Redux.  
 
