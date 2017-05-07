@@ -43,10 +43,10 @@ Redux store object.
 Name of the ActionCable channel.
 #### options (*optional* object)
 **Options:**  
-`connected` - function, *optional*, callback function  
-`disconnected` - function, *optional*, callback function
-`params` - object, *optional*, params sent to Rails
-`prefix` - string, *optional*, *default:* `'CABLECAR'`, used to filter out CableCar actions from non-CableCar actions.  
+`connected` - (function, *optional*) callback function  
+`disconnected` - (function, *optional*) callback function
+`params` - (object, *optional*) params sent to Rails
+`prefix` - (string, *optional*, *default:* `'CABLECAR'`) used to filter out CableCar actions from non-CableCar actions.  
 Actions are only dispatched to the server if they match the given prefix.  
 For example, if `prefix` is set to `'MSG'`:  
 `MSG_ONE_GETS_SENT`, `MESSAGE_TWO_DOES_NOT`  
