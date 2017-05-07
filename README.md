@@ -74,13 +74,13 @@ class ChatChannel < ApplicationCable::Channel
 end
 ```
 
-## Defined Actions
+## Reserved Actions
 ###### Reserved action types fired by CableCar middleware:
 `CABLECAR_INITIALIZED`, `CABLECAR_CONNECTED`, `CABLECAR_DISCONNECTED`
 
 ###### Other reserved action types:
 `CABLECAR_DESTROY` - destroys the websocket connection and the `CableCar`
-  object (Now all actions will work as normal)
+  object (now all actions will run through redux middleware as normal)
 `CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel  
 These actions can be sent from ActionCable or dispatched in Redux.  
 
@@ -96,7 +96,8 @@ ChatChannel.broadcast_to(
 )
 ```
 
-This example sends subscribers from the `green` chat room to the `blue` chat room while remaining on `ChatChannel`. (If no new prefix is given, it will use the old one).
+This example sends subscribers from the `green` chat room to the `blue` chat room while remaining on `ChatChannel`.  
+(If no new prefix is given, it will use the previous one).  
 
 # Broadcast & Dispatch Flow
 #### Broadcasts
