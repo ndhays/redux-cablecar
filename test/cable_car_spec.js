@@ -26,27 +26,40 @@ describe('CableCar', () => {
   });
 
   describe('constructor', () => {
-    it('sets the channel and options', () => {
-      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
-      expect(cc.channel).to.eq('channel');
-      expect(cc.options.opt1).to.eq(5);
-    });
-
     it('sets the store', () => {
       const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
       expect(cc.store).to.eq(mockStore);
     });
-
-    it('sets the subscription', () => {
-      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
-      expect(cc.subscription).to.eq(mockSubscription);
-    });
   });
 
   describe('#initialize', () => {
-    it('creates an ActionCable subscription with proper args', () => {
+    it('sets the channel', () => {
+      const cc = new CableCar(mockStore, 'channel');
+      expect(cc.channel).to.eq('channel');
+    });
+    it('sets the options', () => {
       const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
-      expect(mockCreateFunc).to.have.been.calledWith({ channel: 'channel', opt1: 5 }, {
+      expect(cc.options.opt1).to.eq(5);
+    });
+    it('sets the prefix', () => {
+      const cc = new CableCar(mockStore, 'channel', { prefix: 'MY_PREFIX' });
+      expect(cc.options.prefix).to.eq('MY_PREFIX');
+    });
+    it('sets the default prefix "CABLECAR" if no options are provided', () => {
+      const cc = new CableCar(mockStore, 'channel');
+      expect(cc.options.prefix).to.eq('CABLECAR');
+    });
+    it('sets the default prefix "CABLECAR" if options are provided (but no prefix)', () => {
+      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
+      expect(cc.options.prefix).to.eq('CABLECAR');
+    });
+    it('sets the subscription', () => {
+      const cc = new CableCar(mockStore, 'channel');
+      expect(cc.subscription).to.eq(mockSubscription);
+    });
+    it('creates an ActionCable subscription with proper channel and params args', () => {
+      const cc = new CableCar(mockStore, 'channel', { params: { door: 5 } });
+      expect(mockCreateFunc).to.have.been.calledWith({ channel: 'channel', door: 5 }, {
         initialized: cc.initialized,
         connected: cc.connected,
         disconnected: cc.disconnected,
@@ -64,21 +77,30 @@ describe('CableCar', () => {
       cc.changeChannel('newChannel');
       expect(cc.unsubscribe).to.have.been.calledWith();
     });
-    it('initializes a new subscription', () => {
-      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
+    it('initializes a new subscription w/ same prefix if none is given', () => {
+      const cc = new CableCar(mockStore, 'channel');
       stub(cc, 'unsubscribe');
       stub(cc, 'initialize');
-      cc.changeChannel('newChannel', 'opts');
-      expect(cc.initialize).to.have.been.calledWith('newChannel', 'opts');
+      cc.changeChannel('newChannel');
+      const expectedResult = { prefix: cc.options.prefix };
+      expect(cc.initialize).to.have.been.calledWith('newChannel', expectedResult);
+    });
+    it('initializes a new subscription w/ new options', () => {
+      const cc = new CableCar(mockStore, 'channel');
+      stub(cc, 'unsubscribe');
+      stub(cc, 'initialize');
+      cc.changeChannel('newChannel', { newOpt: 4, prefix: 'GO' });
+      const expectedResult = { newOpt: 4, prefix: 'GO' };
+      expect(cc.initialize).to.have.been.calledWith('newChannel', expectedResult);
     });
   });
 
   describe('#dispatch', () => {
-    it('adds an flag.. CableCar is false', () => {
+    it('adds a flag.. CableCar__Action is true', () => {
       const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
       cc.dispatch({});
       expect(mockStore.dispatch).to.have.been.calledWith({
-        CableCar: false,
+        CableCar__Action: true,
       });
     });
     describe('when msg passed is an object', () => {
@@ -87,7 +109,7 @@ describe('CableCar', () => {
         cc.dispatch({ type: 'testmsg' });
         expect(mockStore.dispatch).to.have.been.calledWith({
           type: 'testmsg',
-          CableCar: false,
+          CableCar__Action: true,
         });
       });
     });
@@ -98,13 +120,23 @@ describe('CableCar', () => {
         cc.dispatch('testmsg');
         expect(mockStore.dispatch).to.have.been.calledWith({
           a: 'action34',
-          CableCar: false,
+          CableCar__Action: true,
         });
       });
     });
   });
   describe('#formatAction', () => {
     it('formats the action properly', () => {
+      const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
+      const result = cc.formatAction('mssg');
+      expect(result.type).to.eq('mssg');
+      expect(result.car).to.eq(cc);
+      expect(result.channel).to.eq(cc.channel);
+      expect(result.options).to.eq(cc.options);
+    });
+  });
+  describe('#prefixMatches', () => {
+    it('checks for the prefix', () => {
       const cc = new CableCar(mockStore, 'channel', { opt1: 5 });
       const result = cc.formatAction('mssg');
       expect(result.type).to.eq('mssg');
@@ -128,6 +160,12 @@ describe('CableCar', () => {
       cc.connected();
       expect(cc.dispatch).to.have.been.calledWith('CABLECAR_CONNECTED');
     });
+    it('calls the callback if one exists', () => {
+      const callback = spy();
+      const cc = new CableCar(mockStore, 'channel', { connected: callback });
+      cc.connected();
+      expect(callback).to.have.been.calledWith();
+    });
   });
   describe('#disconnected', () => {
     it('dispatches the action type: "CABLECAR_DISCONNECTED"', () => {
@@ -135,6 +173,12 @@ describe('CableCar', () => {
       stub(cc, 'dispatch');
       cc.disconnected();
       expect(cc.dispatch).to.have.been.calledWith('CABLECAR_DISCONNECTED');
+    });
+    it('calls the callback if one exists', () => {
+      const callback = spy();
+      const cc = new CableCar(mockStore, 'channel', { disconnected: callback });
+      cc.disconnected();
+      expect(callback).to.have.been.calledWith();
     });
   });
   describe('#received', () => {

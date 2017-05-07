@@ -17,7 +17,7 @@ describe('cablecar middleware', () => {
   });
 
   const mockReducer = (state = { value: 0 }, action) => {
-    if (action.type === 'GO') {
+    if (action.type === 'CHANGE') {
       return { value: action.value };
     }
 
@@ -36,21 +36,21 @@ describe('cablecar middleware', () => {
     describe('when action is optimistic (and not flagged)', () => {
       it('gets passed on to redux', () => {
         expect(store.getState().value).to.eq(0);
-        store.dispatch({ type: 'GO', value: 10, CableCarOptimistic: true });
+        store.dispatch({ type: 'CHANGE', value: 10, CableCarOptimistic: true });
         expect(store.getState().value).to.eq(10);
       });
     });
-    describe('when CableCar is set to false (but not optimistic)', () => {
+    describe('when action is flagged (but not optimistic)', () => {
       it('gets passed on to redux', () => {
         expect(store.getState().value).to.eq(0);
-        store.dispatch({ type: 'GO', value: 10, CableCar: false });
+        store.dispatch({ type: 'CHANGE', value: 10, CableCar__Action: true });
         expect(store.getState().value).to.eq(10);
       });
     });
     describe('when action is neither optimistic nor flagged)', () => {
       it('does not get passed on to redux', () => {
         expect(store.getState().value).to.eq(0);
-        store.dispatch({ type: 'GO', value: 10 });
+        store.dispatch({ type: 'CHANGE', value: 10 });
         expect(store.getState().value).to.eq(0);
       });
     });
