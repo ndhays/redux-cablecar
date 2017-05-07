@@ -44,8 +44,8 @@ Name of the ActionCable channel (ie. 'ChatChannel').
 #### options (*optional*)
 **Options:**  
 `connected` - (*optional*) callback function  
-`disconnected` - (*optional*) callback function
-`params` - (*optional*) params sent to Rails
+`disconnected` - (*optional*) callback function  
+`params` - (*optional*) params sent to Rails  
 `prefix` - (*optional*, *default:* `'CABLECAR'`) used to filter out CableCar actions from non-CableCar actions.  
 Actions are only dispatched to the server if they match the given prefix.  
 For example, if `prefix` is set to `'MSG'`:  
