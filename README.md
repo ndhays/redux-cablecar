@@ -13,8 +13,8 @@ Uses a websocket connection to create a circular message flow between the client
 2. Connect the redux store to cablecar
 
 ## #connect(store, channel, options)
-Connects the store to the ActionCable channel.  
-Returns a `CableCar` object.
+Connects the store to the ActionCable channel   
+Returns a `CableCar` object
 
 ### Example:
 **Client-side: (Redux)**
@@ -27,7 +27,8 @@ const store = createStore(reducer, applyMiddleware(cablecar...));
 
 cablecar.connect(store, 'ChatChannel', { params: { room: 'game' }, prefix: 'RAILS' });
 ```
-This example connects the store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`. (Only actions with types beginning with "RAILS" will be sent).  
+This example connects the store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
+(Only actions with types beginning with "RAILS" will be sent)  
 
 **Server-side: (Rails)**
 ```rubyonrails
@@ -42,17 +43,17 @@ Redux store object.
 #### channel (*required*)
 Name of the ActionCable channel (ie. 'ChatChannel').
 #### options (*optional*)
-**Options:**  
+### Options
 `connected` - (*optional*) callback function  
 `disconnected` - (*optional*) callback function  
 `params` - (*optional*) params sent to Rails  
-`prefix` - (*optional*, *default:* `'CABLECAR'`) used to filter out CableCar actions from non-CableCar actions.  
+`prefix` - (*optional*, *default:* `'CABLECAR'`) used to filter out CableCar actions from non-CableCar actions  
   
 **Actions are only dispatched to the server if they match the given prefix.**  
   
 For example, if `prefix` is set to `'MSG'`:  
 `MSG_ONE_GETS_SENT`, `MESSAGE_TWO_DOES_NOT`  
-(To pass all messages to CableCar, use prefix: `''`).
+(To pass all actions to server, use empty string prefix: `''`).
 
 ## #perform(method, payload)
 Calls a method in Rails. (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
