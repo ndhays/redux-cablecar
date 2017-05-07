@@ -25,7 +25,12 @@ import cablecar from 'redux-cablecar';
 
 const store = createStore(reducer, applyMiddleware(cablecar...));
 
-cablecar.connect(store, 'ChatChannel', { params: { room: 'game' }, prefix: 'RAILS' });
+const options = {
+  params: { room: 'game' }, 
+  prefix: 'RAILS'
+};
+
+cablecar.connect(store, 'ChatChannel', options);
 ```
 This example connects the store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
 (Only actions with types beginning with "RAILS" will be sent)  
@@ -38,22 +43,26 @@ class ChatChannel < ApplicationCable::Channel
   end
 end
 ```
-#### store (*required*)
-Redux store object.
-#### channel (*required*)
-Name of the ActionCable channel (ie. 'ChatChannel').
-#### options (*optional*)
-### Options
+#### store (*required*)  
+Redux store object.  
+
+#### channel (*required*)  
+Name of the ActionCable channel (ie. 'ChatChannel').  
+
+#### options (*optional*)  
+
+### Options  
 `connected` - (*optional*) callback function  
 `disconnected` - (*optional*) callback function  
 `params` - (*optional*) params sent to Rails  
-`prefix` - (*optional*, *default:* `'CABLECAR'`) used to filter out CableCar actions from non-CableCar actions  
+`prefix` - (*optional*, *default:* `'CABLECAR'`) used to filter out CableCar actions from other actions  
   
 **Actions are only dispatched to the server if they match the given prefix.**  
   
 For example, if `prefix` is set to `'MSG'`:  
-`MSG_ONE_GETS_SENT`, `MESSAGE_TWO_DOES_NOT`  
-(To pass all actions to server, use empty string prefix: `''`).
+`MSG_ONE_GETS_SENT`,  
+`MESSAGE_TWO_DOES_NOT`  
+(To pass all actions to server, use empty string `prefix: ''`).
 
 ## #perform(method, payload)
 Calls a method in Rails. (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
@@ -76,10 +85,12 @@ end
 ```
 
 ## Reserved Actions
-###### Reserved action types fired by CableCar middleware:
-`CABLECAR_INITIALIZED`, `CABLECAR_CONNECTED`, `CABLECAR_DISCONNECTED`
+##### Reserved action types fired by CableCar middleware:
+`CABLECAR_INITIALIZED`,  
+`CABLECAR_CONNECTED`,  
+`CABLECAR_DISCONNECTED`  
 
-###### Other reserved action types:
+##### Other reserved action types:
 `CABLECAR_DESTROY` - destroys the websocket connection and the `CableCar`
   object (now all actions will run through redux middleware as normal)  
 `CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel  
