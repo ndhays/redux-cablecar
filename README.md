@@ -15,6 +15,7 @@ The npm package can be bootstrapped to Rails in many ways.
 
 ## #connect(store, channel, options)
 Connects the store to the ActionCable channel   
+`cablecar.connect(store, 'ChatChannel', options);`  
 Returns a `CableCar` object
 
 ### Example:
@@ -66,7 +67,8 @@ For example, if `prefix` is set to `'MSG'`:
 (To pass all actions to server, use empty string `prefix: ''`).
 
 ## #perform(method, payload)
-Calls a method in Rails. (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))
+Calls a method in Rails. (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))  
+`car.perform('activate', { data: ... })`  
 
 **Example:**
 ```js6
