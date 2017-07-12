@@ -1,7 +1,6 @@
 # CableCar (redux-cablecar)
 
-[Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
-It creates a websocket connection with a circular message flow between the client and the server.  
+[Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html), creating a websocket connection with a circular message flow between the client and the server.  
 
 # Rails Demo
 The npm package can be bootstrapped to Rails in many ways.
