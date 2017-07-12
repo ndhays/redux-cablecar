@@ -1,12 +1,11 @@
 # CableCar (redux-cablecar)
 
 [Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
-
-Uses a websocket connection to create a circular message flow between the client and the server.  
+It creates a websocket connection with a circular message flow between the client and the server.  
 
 # Rails Demo
 The npm package can be bootstrapped to Rails in many ways.
-[You can view a demo of a Rails/Redux app that uses the asset pipeline here.](https://github.com/ndhays/redux-cablecar-Rails-Demo-App). As long as the `cable.js` in Rails 5 is loaded first, the cablecar npm function can be used anywhere, as described in [this issue](https://github.com/ndhays/redux-cablecar/issues/2). 
+[You can view a demo of a Rails/Redux app that uses the asset pipeline here.](https://github.com/ndhays/redux-cablecar-Rails-Demo-App) As long as the `cable.js` in Rails 5 is loaded first, the cablecar npm function can be used anywhere, as described in [this issue](https://github.com/ndhays/redux-cablecar/issues/2). 
 
 # Installation
 `npm install redux-cablecar --save`
