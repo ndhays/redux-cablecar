@@ -26,7 +26,7 @@ export default class CableCar {
     let params = options.params || {};
     params = Object.assign({ channel }, params);
 
-    this.subscription = ActionCable.createConsumer().subscriptions.create(
+    this.subscription = ActionCable.createConsumer(options.wsURL).subscriptions.create(
       params, {
         initialized: this.initialized,
         connected: this.connected,
