@@ -1,5 +1,6 @@
 import { createStore, applyMiddleware } from 'redux';
-import { middleware, expect, spy } from './setup';
+import { expect, spy } from '../setup';
+import middleware from '../../src/middleware';
 
 describe('Integrated functionality -->', () => {
   // ACTION CABLE MOCKS
@@ -10,9 +11,10 @@ describe('Integrated functionality -->', () => {
     unsubscribe: spy(),
   };
   let ActionCableCalls;
+  let ActionCableMockProvider;
 
   before(() => {
-    global.ActionCable = {
+    ActionCableMockProvider = {
       createConsumer: () => ({
         subscriptions: {
           create: (params, callbacks) => {
@@ -24,7 +26,7 @@ describe('Integrated functionality -->', () => {
     };
   });
   after(() => {
-    global.ActionCable = null;
+    ActionCableMockProvider = null;
   });
 
   // REDUX MOCKS
@@ -54,16 +56,21 @@ describe('Integrated functionality -->', () => {
     loggedClientActions = [];
   });
 
+  afterEach(() => {
+    mystore.dispatch({ type: "CABLECAR_DESTROY_ALL" });
+  })
+
   it('sends and receives the proper messages', () => {
     const options = { params: { room: 5 }, prefix: '' };
+    middleware.setProvider(ActionCableMockProvider);
     car = middleware.connect(mystore, 'MyChannel', options);
 
     expect(mystore.getState().value).to.eq(0);
-    mystore.dispatch({ type: 'beforehand' });
+    mystore.dispatch({ type: 'dropped' });
     ActionCableCalls.initialized();
-    mystore.dispatch({ type: 'now cable car takes over' });
+    mystore.dispatch({ type: 'initialized but not connected' });
     ActionCableCalls.connected();
-    mystore.dispatch({ type: 'ok' });
+    mystore.dispatch({ type: 'now cable car takes over' });
     ActionCableCalls.disconnected();
     mystore.dispatch({ type: 'cable car is disconnected, but still exists' });
     ActionCableCalls.connected();
@@ -73,34 +80,39 @@ describe('Integrated functionality -->', () => {
     expect(mystore.getState().value).to.eq(100);
     ActionCableCalls.received({
       type: 'CABLECAR_CHANGE_CHANNEL',
-      channel: 'NewChannel',
+      previousChannel: 'MyChannel',
+      newChannel: 'NewChannel',
       options: { params: { room: 6 } },
     });
-    expect(car.channel).to.eq('NewChannel');
-    expect(car.options.params.room).to.eq(6);
+    expect(car.getChannel()).to.eq('NewChannel');
+    expect(car.getParams().room).to.eq(6);
+    ActionCableCalls.initialized();
+    mystore.dispatch({ type: 'initialized but not connected' });
+    ActionCableCalls.connected();
+    mystore.dispatch({ type: 'now cable car takes over' });
     mystore.dispatch({ type: 'CABLECAR_DESTROY' });
     mystore.dispatch({ type: 'works again as normal' });
 
-    expect(loggedServerActions[0]).to.eq('ok');
+    expect(loggedServerActions[0]).to.eq('now cable car takes over');
     expect(loggedServerActions[1]).to.eq('we are back');
 
-    expect(loggedClientActions[0]).to.eq('beforehand');
-    expect(loggedClientActions[1]).to.eq('CABLECAR_INITIALIZED');
-    expect(loggedClientActions[2]).to.eq('CABLECAR_CONNECTED');
-    expect(loggedClientActions[3]).to.eq('CABLECAR_DISCONNECTED');
-    expect(loggedClientActions[4]).to.eq('CABLECAR_CONNECTED');
-    expect(loggedClientActions[5]).to.eq('HELLO_FROM_SERVER');
-    expect(loggedClientActions[6]).to.eq('CHANGE_VALUE');
-    expect(loggedClientActions[7]).to.eq('CABLECAR_DISCONNECTED');
-    expect(loggedClientActions[8]).to.eq('CABLECAR_CHANGE_CHANNEL');
+    expect(loggedClientActions[0]).to.eq('CABLECAR_INITIALIZED');
+    expect(loggedClientActions[1]).to.eq('CABLECAR_CONNECTED');
+    expect(loggedClientActions[2]).to.eq('CABLECAR_DISCONNECTED');
+    expect(loggedClientActions[3]).to.eq('CABLECAR_CONNECTED');
+    expect(loggedClientActions[4]).to.eq('HELLO_FROM_SERVER');
+    expect(loggedClientActions[5]).to.eq('CHANGE_VALUE');
+    expect(loggedClientActions[6]).to.eq('CABLECAR_DISCONNECTED');
+    expect(loggedClientActions[7]).to.eq('CABLECAR_INITIALIZED');
+    expect(loggedClientActions[8]).to.eq('CABLECAR_CONNECTED');
     expect(loggedClientActions[9]).to.eq('CABLECAR_DISCONNECTED');
-    expect(loggedClientActions[10]).to.eq('CABLECAR_DESTROY');
-    expect(loggedClientActions[11]).to.eq('works again as normal');
-    expect(loggedClientActions.length).to.eq(12);
+    expect(loggedClientActions[10]).to.eq('works again as normal');
+    expect(loggedClientActions.length).to.eq(11);
   });
 
   it('prefixes: sends and receives the proper messages', () => {
-    const options = { params: { room: 5 } };
+    const options = { prefix: 'CABLECAR', params: { room: 5 } };
+    middleware.setProvider(ActionCableMockProvider);
     car = middleware.connect(mystore, 'MyChannel', options);
 
     ActionCableCalls.initialized();
@@ -109,22 +121,22 @@ describe('Integrated functionality -->', () => {
     mystore.dispatch({ type: 'SKIP_SERVER', payload: 'NO' });
     ActionCableCalls.received({
       type: 'CABLECAR_CHANGE_CHANNEL',
-      channel: 'NewChannel',
-      options: { params: { room: 6 }, prefix: '' },
+      newChannel: 'NewChannel',
+      previousChannel: 'MyChannel',
+      options: { prefix: 'NEW', params: { room: 6 } },
     });
     ActionCableCalls.connected();
-    mystore.dispatch({ type: 'CABLECAR_SENDING_TO_RAILS_2', payload: 'YES' });
-    mystore.dispatch({ type: 'NEW_PREFIX', payload: 'YES' });
+    mystore.dispatch({ type: 'NEW_SENDING_TO_RAILS_2', payload: 'YES' });
+    mystore.dispatch({ type: 'CABLECAR_NOW_REDUX_ONLY', payload: 'YES' });
 
     expect(loggedServerActions[0]).to.eq('CABLECAR_SENDING_TO_RAILS');
-    expect(loggedServerActions[1]).to.eq('CABLECAR_SENDING_TO_RAILS_2');
-    expect(loggedServerActions[2]).to.eq('NEW_PREFIX');
+    expect(loggedServerActions[1]).to.eq('NEW_SENDING_TO_RAILS_2');
 
     expect(loggedClientActions[0]).to.eq('CABLECAR_INITIALIZED');
     expect(loggedClientActions[1]).to.eq('CABLECAR_CONNECTED');
     expect(loggedClientActions[2]).to.eq('SKIP_SERVER');
     expect(loggedClientActions[3]).to.eq('CABLECAR_DISCONNECTED');
-    expect(loggedClientActions[4]).to.eq('CABLECAR_CHANGE_CHANNEL');
-    expect(loggedClientActions[5]).to.eq('CABLECAR_CONNECTED');
+    expect(loggedClientActions[4]).to.eq('CABLECAR_CONNECTED');
+    expect(loggedClientActions[5]).to.eq('CABLECAR_NOW_REDUX_ONLY');
   });
 });

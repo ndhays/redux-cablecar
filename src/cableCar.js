@@ -1,33 +1,37 @@
-/* global ActionCable */
 
 export default class CableCar {
 
-  constructor(store, channel, options = {}) {
-    if (typeof ActionCable === 'undefined') {
-      throw new Error('CableCar tried to connect to ActionCable but ActionCable is not defined');
+  constructor(cableProvider, store, channel, options = {}) {
+    if (typeof cableProvider === 'undefined') {
+      throw new Error(`CableCar: unknown ActionCable provider: ${cableProvider}`);
+    }
+
+    if (typeof store === 'undefined' || typeof store.dispatch === 'undefined') {
+      throw new Error(`CableCar: unknown store: ${store}`);
     }
 
     if (typeof channel !== 'string') {
       throw new Error(`CableCar: unknown channel: ${channel}`);
     }
 
+    this.actionCableProvider = cableProvider;
     this.store = store;
 
-    this.initialize(channel, options);
+    const defaultOptions = { prefix: 'RAILS', optimisticOnFail: false };
+    this.initialize(channel, Object.assign(defaultOptions, options));
   }
 
-  initialize = (channel, options) => {
+  initialize(channel, options) {
+
     this.channel = channel;
     this.options = options;
-    if (typeof this.options.prefix === 'undefined') {
-      this.options.prefix = 'CABLECAR';
-    }
+    this.running = false;
 
-    let params = options.params || {};
-    params = Object.assign({ channel }, params);
+    let cableParams = options.params || {};
+    cableParams = Object.assign({ channel }, cableParams);
 
-    this.subscription = ActionCable.createConsumer().subscriptions.create(
-      params, {
+    this.subscription = this.actionCableProvider.createConsumer().subscriptions.create(
+      cableParams, {
         initialized: this.initialized,
         connected: this.connected,
         disconnected: this.disconnected,
@@ -37,51 +41,24 @@ export default class CableCar {
     );
   }
 
-  changeChannel = (channel, options = {}) => {
-    this.unsubscribe();
-    const newOptions = options;
-    if (typeof newOptions.prefix === 'undefined') {
-      newOptions.prefix = this.options.prefix;
-    }
-    this.initialize(channel, newOptions);
-  }
-
-  // Redux dispatch function
-  dispatch = (msg) => {
-    let action = typeof msg === 'object' ? msg : this.formatAction(msg);
-    action = Object.assign(action, { CableCar__Action: true });
-    this.store.dispatch(action);
-  }
-
-  formatAction = msg => ({
-    type: msg,
-    car: this,
-    channel: this.channel,
-    options: this.options,
-  })
-
-  prefixMatches = (action = {}) => {
-    if (typeof action === 'object' && typeof action.type === 'string') {
-      const actionPrefix = action.type.slice(0, this.options.prefix.length);
-      return actionPrefix === this.options.prefix;
-    }
-    throw new Error(`CableCar: ${action} is not a valid redux action`);
-  }
-
   // ActionCable callback functions
-  initialized = () => this.dispatch('CABLECAR_INITIALIZED')
+  initialized = () => this.dispatch({ type: 'CABLECAR_INITIALIZED' });
 
   connected = () => {
-    this.dispatch('CABLECAR_CONNECTED');
+    this.dispatch({ type: 'CABLECAR_CONNECTED' });
+    this.running = true;
     if (this.options.connected) { this.options.connected.call(); }
   }
 
   disconnected = () => {
-    this.dispatch('CABLECAR_DISCONNECTED');
+    this.dispatch({ type: 'CABLECAR_DISCONNECTED' });
+    this.running = false;
     if (this.options.disconnected) { this.options.disconnected.call(); }
   }
 
-  received = msg => this.dispatch(msg)
+  received = (msg) => {
+    this.dispatch(msg);
+  }
 
   rejected = () => {
     throw new Error(
@@ -90,12 +67,51 @@ export default class CableCar {
     );
   }
 
+  // Redux dispatch function
+  dispatch(action) {
+    const newAction = Object.assign(action, {
+      channel: this.channel,
+      CableCar__Action: true,
+    });
+    this.store.dispatch(newAction);
+  }
+
+  allows(action) {
+    if (typeof action !== 'object' || typeof action.type !== 'string') {
+      throw new Error(`CableCar: ${action} is not a valid redux action ({ type: ... })`);
+    }
+
+    return this.matchPrefix(action.type);
+  }
+
+  matchPrefix(type) {
+    const prefix = type.slice(0, this.options.prefix.length);
+    return prefix === this.options.prefix;
+  }
+
   // ActionCable subscription functions (exposed globally)
-  perform = (method, payload) => this.subscription.perform(method, payload)
+  changeChannel(channel, options = {}) {
+    this.unsubscribe();
+    this.initialize(channel, Object.assign(this.options, options));
+  }
 
-  send = action => this.subscription.send(action)
+  getChannel() {
+    return this.channel;
+  }
 
-  unsubscribe = () => {
+  getParams() {
+    return this.options.params;
+  }
+
+  perform(method, payload) {
+    this.subscription.perform(method, payload);
+  }
+
+  send(action) {
+    this.subscription.send(action);
+  }
+
+  unsubscribe() {
     this.subscription.unsubscribe();
     this.disconnected();
   }
