@@ -1,5 +1,8 @@
 # Change Log
 
+## version 3.0.1
+- bug fix
+
 ## version 3.0.0
 
 - renames `matchPrefix` option to `prefix`
