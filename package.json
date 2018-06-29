@@ -1,13 +1,13 @@
 {
   "name": "redux-cablecar",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "description": "Rails 5 ActionCable <-> Redux middleware",
   "main": "./build/redux-cablecar.js",
   "scripts": {
     "build": "npm run build-main; npm run build-min;",
     "build-main": "webpack --output-filename redux-cablecar.js --config webpack.config.js;",
     "build-min": "webpack --output-filename redux-cablecar.min.js --config webpack.config.js --optimize-minimize --devtool 'source-map';",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "./node_modules/mocha/bin/mocha --recursive --compilers js:babel-core/register",
     "watch": "webpack --output-filename redux-cablecar.js --config webpack.config.js --watch"
   },
@@ -32,7 +32,7 @@
     ]
   },
   "devDependencies": {
-    "babel-core": "^6.9.1",
+    "babel-core": "^6.26.3",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^6.2.8",
     "babel-preset-babili": "0.0.9",
@@ -41,13 +41,14 @@
     "chai": "^3.5.0",
     "eslint": "^3.11.0",
     "eslint-config-airbnb-base": "^10.0.1",
-    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-import": "^2.13.0",
     "mocha": "^3.2.0",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
     "webpack": "^1.13.3"
   },
   "dependencies": {
+    "actioncable": "^5.2.0",
     "redux": "^3.6.0"
   }
 }

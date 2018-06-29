@@ -1,10 +1,10 @@
 # CableCar (redux-cablecar)
 
-[Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html), creating a websocket connection with a circular message flow between the client and the server.  
+[Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
 
-# Rails Demo
-The npm package can be bootstrapped to Rails in many ways.
-[You can view a demo of a Rails/Redux app that uses the asset pipeline here.](https://github.com/ndhays/redux-cablecar-Rails-Demo-App) As long as the `cable.js` in Rails 5 is loaded first, the cablecar npm function can be used anywhere, as described in [this issue](https://github.com/ndhays/redux-cablecar/issues/2). 
+Uses a websocket connection to create a circular message flow between the client and the server.  
+
+[Demo App](https://github.com/ndhays/redux-cablecar-Rails-Demo-App)
 
 # Installation
 `npm install redux-cablecar --save`
@@ -14,14 +14,11 @@ The npm package can be bootstrapped to Rails in many ways.
 2. Connect the redux store to cablecar
 
 ## #connect(store, channel, options)
-Connects the store to the ActionCable channel  
-  
-`cablecar.connect(store, 'ChatChannel', options);`  
-  
+Connects the store to the ActionCable channel   
 Returns a `CableCar` object
 
 ### Example:
-**Client-side: (Redux)**
+**Redux Client-side:**
 ```js6
 import { createStore, applyMiddleware } from 'redux';
 import reducer from './reducers/rootReducer';
@@ -30,16 +27,16 @@ import cablecar from 'redux-cablecar';
 const store = createStore(reducer, applyMiddleware(cablecar...));
 
 const options = {
-  params: { room: 'game' }, 
-  prefix: 'RAILS'
+  params: { room: 'game' },
+  prefix: 'SERVER_ACTION'
 };
 
 cablecar.connect(store, 'ChatChannel', options);
 ```
-This example connects the store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
-(Only actions with types beginning with "RAILS" will be sent)  
+This connects the store to the ActionCable subscription `ChatChannel` with `params[:room] = "game"`.  
 
-**Server-side: (Rails)**
+
+**Rails Server-side:**
 ```rubyonrails
 class ChatChannel < ApplicationCable::Channel
   def subscribed
@@ -59,20 +56,32 @@ Name of the ActionCable channel (ie. 'ChatChannel').
 `connected` - (*optional*) callback function  
 `disconnected` - (*optional*) callback function  
 `params` - (*optional*) params sent to Rails  
-`prefix` - (*optional*, *default:* `'CABLECAR'`) used to filter out CableCar actions from other actions  
-  
-**Actions are only dispatched to the server if they match the given prefix.**  
-  
-For example, if `prefix` is set to `'MSG'`:  
-`MSG_ONE_GETS_SENT`,  
+`prefix` - (*optional*, *default:* `'RAILS'`) can be used to filter out CableCar actions from other actions  
+`optimisticOnFail` - (*optional*, *default:* `false`) - if action is rejected by ActionCable, then it continues thru client-side middleware instead of getting dropped
+
+**Actions are only dispatched to the server if they match the prefix. (default prefix: 'RAILS')**  
+
+For example, if the `prefix` is set to `'SYSTEM'`:  
+`SYSTEM_ONE_GETS_SENT_TO_SERVER`,  
 `MESSAGE_TWO_DOES_NOT`  
 (To pass all actions to server, use empty string `prefix: ''`).
 
-## #perform(method, payload)
-Calls a method in Rails. (see #perform method in [ActionCable documentation](http://edgeguides.rubyonrails.org/action_cable_overview.html))  
-  
-`car.perform('activate', { data: ... })`  
-  
+## CableCar object
+The middleware's `#connect` function returns a CableCar object with the following functions:
+
+### #changeChannel(channel, options)
+Manually change the car's channel.  
+(See below on how to do it with a *Redux action*)
+
+### #getChannel
+Returns the current CableCar's channel.
+
+### #getParams
+Returns the current CableCar's params.
+
+### #perform(method, payload)
+Calls a Rails method directly.
+
 **Example:**
 ```js6
 const car = cablecar.connect(store, ... )
@@ -85,12 +94,16 @@ class ChatChannel < ApplicationCable::Channel
   end
 
   def activate(payload)
-    do_something_to_activate(with: payload["data"])
+    ...
   end
 end
 ```
+([See ActionCable documentation for more](http://edgeguides.rubyonrails.org/action_cable_overview.html))
 
-## Reserved Actions
+### #send(action)
+Sends a direct communication to Rails (outside of the Redux middleware chain)
+
+## Reserved Action Types
 ##### Reserved action types fired by CableCar middleware:
 `CABLECAR_INITIALIZED`,  
 `CABLECAR_CONNECTED`,  
@@ -99,8 +112,9 @@ end
 ##### Other reserved action types:
 `CABLECAR_DESTROY` - destroys the websocket connection and the `CableCar`
   object (now all actions will run through redux middleware as normal)  
+  
 `CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel  
-These actions can be sent from ActionCable or dispatched in Redux.  
+These actions can be sent from ActionCable or dispatched in Redux on the front end.  
 
 **Change Channel Example:**  
 ```rubyonrails
@@ -139,6 +153,14 @@ However if `CableCarOptimistic: true` is in the action payload, then the action 
 
 **optimistic action:**  
 `--> CLIENT dispatches action --> middleware --> server AND next middlewares/reducers`
+
+# Development
+Download and run `npm install`.  
+
+Link the package locally with `npm link` and use `npm run watch` to update package changes. Pull requests welcome.
+
+# Tests
+`npm test`
 
 ## License
 
