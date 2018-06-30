@@ -2,7 +2,7 @@
 
 [Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
 
-Uses a websocket connection to create a circular message flow between the client and the server.  
+Uses a websocket connection to flow redux actions between the client and the server.  
 
 [Demo App](https://github.com/ndhays/redux-cablecar-Rails-Demo-App)
 
