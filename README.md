@@ -138,24 +138,20 @@ This example sends subscribers from the `green` chat room to the `blue` chat roo
 #### Broadcasts
 Actions broadcasted from Rails are dispatched to Redux:
 
-`--> SERVER broadcasts message --> middleware --> CLIENT`
+`--> RAILS SERVER broadcasts message --> middleware --> CLIENT (ReduxJS) `
 
 #### Dispatches
 Actions originating on the client are sent to an ActionCable channel:
 
-`--> CLIENT dispatches action --> middleware --> SERVER`
+`--> CLIENT store dispatches action --> middleware --> SERVER CHANNEL`
 
 #### Optimistic Dispatches
-Actions originating on the client *by default* are stopped before going to the reducers.
+CableCar actions originating on the client *by default* get rerouted to the server. 
 
-Broadcasted messages from the server also don't get re-dispatched back to the server (in an infinite loop).  
-
-This creates a circular message flow between the client (Redux) and the server (ActionCable).  
-
-However if `optimistic: true` is in the action payload, then the action will be sent to both the Rails Server, in addition to being propagated up thru the Redux middlewares. These actions are considered 'optimistic' updates since when news comes back from the server it may conflict with changes that have already been made on the client. *Caution!*
+However if `optimistic: true` is in the action payload, then the action will be sent to both the Rails Server, and in addition to being propagated thru the Redux middlewares. These actions are considered 'optimistic' updates, since when news comes back from the server it may conflict with changes that have already been made on the client. *Use With Caution!*
 
 **optimistic action:**  
-`--> CLIENT dispatches action --> middleware --> server AND next middlewares/reducers`
+`--> CLIENT store dispatches action --> middleware --> CLIENT/SERVER simultaneously`
 
 # Development
 Download and run `npm install`.  
