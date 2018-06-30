@@ -10,8 +10,8 @@ Uses a websocket connection to create a circular message flow between the client
 `npm install redux-cablecar --save`
 
 # Usage
-1. Add `cablecar` to the list of middlewares
-2. Connect the redux store to cablecar
+1. Apply `cablecar` as a redux middleware
+2. Connect the cablecar middleware to the redux store
 
 ## #setProvider(actionCableProvider) *optional*
 By default the Rails 'actionprovider' package is used, but it can be passed into the middleware as well. It must be set before calling #connect.
@@ -20,7 +20,7 @@ By default the Rails 'actionprovider' package is used, but it can be passed into
 Connects the store to the ActionCable channel   
 Returns a `CableCar` object
 
-### Example:
+## Example:
 **Redux Client-side:**
 ```js6
 import { createStore, applyMiddleware } from 'redux';
@@ -152,7 +152,7 @@ Broadcasted messages from the server also don't get re-dispatched back to the se
 
 This creates a circular message flow between the client (Redux) and the server (ActionCable).  
 
-However if `CableCarOptimistic: true` is in the action payload, then the action will be sent to both the Rails Server, in addition to being propagated up thru the Redux middlewares. These actions are considered 'optimistic' updates since when news comes back from the server it may conflict with changes that have already been made on the client. *Caution!*
+However if `optimistic: true` is in the action payload, then the action will be sent to both the Rails Server, in addition to being propagated up thru the Redux middlewares. These actions are considered 'optimistic' updates since when news comes back from the server it may conflict with changes that have already been made on the client. *Caution!*
 
 **optimistic action:**  
 `--> CLIENT dispatches action --> middleware --> server AND next middlewares/reducers`
