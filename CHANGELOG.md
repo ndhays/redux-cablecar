@@ -1,7 +1,7 @@
 # Change Log
 
-## version 3.0.1
-- bug fix
+## version 3.0.1, 3.0.2
+- bug fixes & documentation
 
 ## version 3.0.0
 
