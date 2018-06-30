@@ -13,6 +13,9 @@ Uses a websocket connection to create a circular message flow between the client
 1. Add `cablecar` to the list of middlewares
 2. Connect the redux store to cablecar
 
+## #setProvider(actionCableProvider) *optional*
+By default the Rails 'actionprovider' package is used, but it can be passed into the middleware as well. It must be set before calling #connect.
+
 ## #connect(store, channel, options)
 Connects the store to the ActionCable channel   
 Returns a `CableCar` object
@@ -112,7 +115,7 @@ Sends a direct communication to Rails (outside of the Redux middleware chain)
 ##### Other reserved action types:
 `CABLECAR_DESTROY` - destroys the websocket connection and the `CableCar`
   object (now all actions will run through redux middleware as normal)  
-  
+
 `CABLECAR_CHANGE_CHANNEL` - reconnects to a new channel  
 These actions can be sent from ActionCable or dispatched in Redux on the front end.  
 
