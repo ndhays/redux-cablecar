@@ -1,6 +1,6 @@
 # Change Log
 
-## 3.0.0 (and 3.0.x)
+## JULY 2018 - version 3.0.0 (and 3.0.x)
 
 - renames `matchPrefix` option to `prefix`
 - default prefix option is now `RAILS`
