@@ -146,7 +146,7 @@ Actions originating on the client are sent to an ActionCable channel:
 `--> CLIENT store dispatches action --> middleware --> SERVER CHANNEL`
 
 #### Optimistic Dispatches
-CableCar actions originating on the client *by default* get rerouted to the server. 
+CableCar actions originating on the client *by default* get rerouted to the server.
 
 However if `optimistic: true` is in the action payload, then the action will be sent to both the Rails Server, and in addition to being propagated thru the Redux middlewares. These actions are considered 'optimistic' updates, since when news comes back from the server it may conflict with changes that have already been made on the client. *Use With Caution!*
 
@@ -154,9 +154,9 @@ However if `optimistic: true` is in the action payload, then the action will be 
 `--> CLIENT store dispatches action --> middleware --> CLIENT/SERVER simultaneously`
 
 # Development
-Download and run `npm install`.  
+Download and run `yarn`.  
 
-Link the package locally with `npm link` and use `npm run watch` to update package changes. Pull requests welcome.
+You can link the package locally with `yarn link` and use `yarn run watch` to update package changes. Pull requests welcome.
 
 # Tests
 `npm test`
