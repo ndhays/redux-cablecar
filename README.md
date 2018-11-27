@@ -159,7 +159,7 @@ Download and run `yarn`.
 You can link the package locally with `yarn link` and use `yarn run watch` to update package changes. Pull requests welcome.
 
 # Tests
-`npm test`
+`yarn test`
 
 ## License
 
