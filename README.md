@@ -1,6 +1,6 @@
 # CableCar (redux-cablecar)
 
-[Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails 5 ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
+[Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
 
 Uses a websocket connection to flow redux actions between the client and the server.  
 
