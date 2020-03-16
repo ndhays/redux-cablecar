@@ -1,14 +1,17 @@
 {
   "name": "redux-cablecar",
-  "version": "3.0.5",
-  "description": "Rails 5 ActionCable <-> Redux middleware",
+  "engines": {
+    "node": ">=12.16.1"
+  },
+  "version": "3.0.6",
+  "description": "Rails 6 ActionCable <-> Redux middleware",
   "main": "./build/redux-cablecar.js",
   "scripts": {
     "build": "npm run build-main; npm run build-min;",
     "build-main": "webpack --output-filename redux-cablecar.js --config webpack.config.js;",
     "build-min": "webpack --output-filename redux-cablecar.min.js --config webpack.config.js --optimize-minimize --devtool 'source-map';",
     "prepublishOnly": "npm run build",
-    "test": "./node_modules/mocha/bin/mocha --recursive --compilers js:babel-core/register",
+    "test": "mocha --recursive --require @babel/register",
     "watch": "webpack --output-filename redux-cablecar.js --config webpack.config.js --watch"
   },
   "author": "Nick Demarest",
@@ -27,28 +30,26 @@
   "license": "MIT",
   "babel": {
     "presets": [
-      "es2015",
-      "stage-0"
+      "@babel/preset-env"
     ]
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^10.0.1",
-    "babel-loader": "^6.2.8",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-stage-0": "^6.16.0",
-    "chai": "^3.5.0",
-    "eslint": "^4.12.1",
-    "eslint-config-airbnb-base": "^13.1.0",
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/register": "^7.8.6",
+    "babel-loader": "^8.0.6",
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.14.0",
-    "mocha": "^3.2.0",
-    "sinon": "^1.17.6",
-    "sinon-chai": "^2.8.0",
-    "webpack": "^1.13.3"
+    "mocha": "^7.1.0",
+    "sinon": "^9.0.1",
+    "sinon-chai": "^3.5.0",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {
     "actioncable": "^5.2.1",
-    "babel-preset-minify": "^0.5.0",
-    "redux": "^3.6.0"
+    "redux": "^4.0.5"
   }
 }

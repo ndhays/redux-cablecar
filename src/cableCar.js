@@ -30,6 +30,26 @@ export default class CableCar {
     let cableParams = options.params || {};
     cableParams = Object.assign({ channel }, cableParams);
 
+    // ActionCable callback functions
+    this.initialized = () => this.dispatch({ type: 'CABLECAR_INITIALIZED' });
+    this.connected = () => {
+      this.dispatch({ type: 'CABLECAR_CONNECTED' });
+      this.running = true;
+      if (this.options.connected) { this.options.connected.call(); }
+    };
+    this.disconnected = () => {
+      this.dispatch({ type: 'CABLECAR_DISCONNECTED' });
+      this.running = false;
+      if (this.options.disconnected) { this.options.disconnected.call(); }
+    };
+    this.received = (msg) => { this.dispatch(msg); };
+    this.rejected = () => {
+      throw new Error(
+        `CableCar: Attempt to connect was rejected.
+        (Channel: ${this.channel})`,
+      );
+    };
+
     this.subscription = this.actionCableProvider.createConsumer(options.wsURL).subscriptions.create(
       cableParams, {
         initialized: this.initialized,
@@ -38,32 +58,6 @@ export default class CableCar {
         received: this.received,
         rejected: this.rejected,
       },
-    );
-  }
-
-  // ActionCable callback functions
-  initialized = () => this.dispatch({ type: 'CABLECAR_INITIALIZED' });
-
-  connected = () => {
-    this.dispatch({ type: 'CABLECAR_CONNECTED' });
-    this.running = true;
-    if (this.options.connected) { this.options.connected.call(); }
-  }
-
-  disconnected = () => {
-    this.dispatch({ type: 'CABLECAR_DISCONNECTED' });
-    this.running = false;
-    if (this.options.disconnected) { this.options.disconnected.call(); }
-  }
-
-  received = (msg) => {
-    this.dispatch(msg);
-  }
-
-  rejected = () => {
-    throw new Error(
-      `CableCar: Attempt to connect was rejected.
-      (Channel: ${this.channel})`,
     );
   }
 

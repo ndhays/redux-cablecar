@@ -1,5 +1,11 @@
 # Change Log
 
+## MARCH 2020 - version 3.0.6
+
+- upgrades packages (Rails 6, security warnings)
+- removes yarn
+
+
 ## JULY 2018 - version 3.0.0 (and 3.0.x)
 
 - renames `matchPrefix` option to `prefix`

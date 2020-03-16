@@ -1,12 +1,15 @@
+const path = require('path');
+
 module.exports = {
+  mode: 'production',
   entry: './index.js',
   output: {
-    path: './build',
+    path: path.resolve(__dirname, "build"),
     library: 'cablecar',
     libraryTarget: 'commonjs2',
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'babel-loader',

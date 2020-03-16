@@ -154,14 +154,14 @@ However if `optimistic: true` is in the action payload, then the action will be 
 `--> CLIENT store dispatches action --> middleware --> CLIENT/SERVER simultaneously`
 
 # Development
-Download and run `yarn`.  
+Download and run `npm install`.  
 
-You can link the package locally with `yarn link` and use `yarn run watch` to update package changes.  
-  
+You can link the package locally with `npm link` and use `npm run watch` to update package changes.  
+
 Pull requests welcome.
 
 # Tests
-`yarn test`
+`npm test`
 
 ## License
 
