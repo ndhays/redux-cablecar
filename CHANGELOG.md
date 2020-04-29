@@ -1,5 +1,12 @@
 # Change Log
 
+## APRIL 2020
+### 3.0.8
+- race condition [bug fix](https://github.com/ndhays/redux-cablecar/issues/9)
+
+### 3.0.7
+- npm audit
+
 ## MARCH 2020 - version 3.0.6
 
 - upgrades packages (Rails 6, security warnings)

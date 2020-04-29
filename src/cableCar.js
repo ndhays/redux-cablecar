@@ -33,13 +33,13 @@ export default class CableCar {
     // ActionCable callback functions
     this.initialized = () => this.dispatch({ type: 'CABLECAR_INITIALIZED' });
     this.connected = () => {
-      this.dispatch({ type: 'CABLECAR_CONNECTED' });
       this.running = true;
+      this.dispatch({ type: 'CABLECAR_CONNECTED' });
       if (this.options.connected) { this.options.connected.call(); }
     };
     this.disconnected = () => {
-      this.dispatch({ type: 'CABLECAR_DISCONNECTED' });
       this.running = false;
+      this.dispatch({ type: 'CABLECAR_DISCONNECTED' });
       if (this.options.disconnected) { this.options.disconnected.call(); }
     };
     this.received = (msg) => { this.dispatch(msg); };
