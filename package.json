@@ -3,7 +3,7 @@
   "engines": {
     "node": ">=12.16.1"
   },
-  "version": "3.0.8",
+  "version": "3.0.9",
   "description": "Rails 6 ActionCable <-> Redux middleware",
   "main": "./build/redux-cablecar.js",
   "scripts": {

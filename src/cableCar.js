@@ -17,8 +17,11 @@ export default class CableCar {
     this.actionCableProvider = cableProvider;
     this.store = store;
 
-    const defaultOptions = { prefix: 'RAILS', optimisticOnFail: false };
-    this.initialize(channel, Object.assign(defaultOptions, options));
+    const defaultOptions = {
+      prefix: 'RAILS',
+      optimisticOnFail: false
+    };
+    this.initialize(channel, { ...defaultOptions, ...options });
   }
 
   initialize(channel, options) {
@@ -28,7 +31,7 @@ export default class CableCar {
     this.running = false;
 
     let cableParams = options.params || {};
-    cableParams = Object.assign({ channel }, cableParams);
+    cableParams = { channel, ...cableParams };
 
     // ActionCable callback functions
     this.initialized = () => this.dispatch({ type: 'CABLECAR_INITIALIZED' });
@@ -63,10 +66,10 @@ export default class CableCar {
 
   // Redux dispatch function
   dispatch(action) {
-    const newAction = Object.assign(action, {
+    const newAction = { ...action,
       channel: this.channel,
       CableCar__Action: true,
-    });
+    };
     this.store.dispatch(newAction);
   }
 
@@ -79,14 +82,20 @@ export default class CableCar {
   }
 
   matchPrefix(type) {
-    const prefix = type.slice(0, this.options.prefix.length);
-    return prefix === this.options.prefix;
+    let matches = false, prefixes = [].concat(this.options.prefix);
+    for (let prefix of prefixes) {
+      if (type.slice(0, String(prefix).length) === String(prefix)) {
+        matches = true;
+        break;
+      }
+    }
+    return matches;
   }
 
   // ActionCable subscription functions (exposed globally)
   changeChannel(channel, options = {}) {
     this.unsubscribe();
-    this.initialize(channel, Object.assign(this.options, options));
+    this.initialize(channel, { ...this.options, ...options });
   }
 
   getChannel() {

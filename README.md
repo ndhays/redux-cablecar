@@ -59,14 +59,14 @@ Name of the ActionCable channel (ie. 'ChatChannel').
 `connected` - (*optional*) callback function  
 `disconnected` - (*optional*) callback function  
 `params` - (*optional*) params sent to Rails  
-`prefix` - (*optional*, *default:* `'RAILS'`) can be used to filter out CableCar actions from other actions  
+`prefix` - (*optional*, *default:* `'RAILS'`) can be used to filter out CableCar actions from other actions (**also accepts an array as a list of string prefixes**)
 `optimisticOnFail` - (*optional*, *default:* `false`) - if action is rejected by ActionCable, then it continues thru client-side middleware instead of getting dropped
 
 **Actions are only dispatched to the server if they match the prefix. (default prefix: 'RAILS')**  
 
-For example, if the `prefix` is set to `'SYSTEM'`:  
-`SYSTEM_ONE_GETS_SENT_TO_SERVER`,  
-`MESSAGE_TWO_DOES_NOT`  
+For example, if the `prefix` is set to `'TODO'` (or `['TODO/', 'SYSTEM/']`):  
+`TODO/GETS_SENT_TO_SERVER`,  
+`MESSAGE/DOES_NOT`  
 (To pass all actions to server, use empty string `prefix: ''`).
 
 ## CableCar object

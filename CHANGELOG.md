@@ -1,5 +1,9 @@
 # Change Log
 
+## JUNE 2020
+### 3.0.9
+- `prefix` config option accepts list of strings for use w/ different action name conventions
+
 ## APRIL 2020
 ### 3.0.8
 - race condition [bug fix](https://github.com/ndhays/redux-cablecar/issues/9)

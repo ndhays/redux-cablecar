@@ -111,14 +111,15 @@ describe('Integrated functionality -->', () => {
   });
 
   it('prefixes: sends and receives the proper messages', () => {
-    const options = { prefix: 'CABLECAR', params: { room: 5 } };
+    const options = { prefix: ['GOOD_ACTION', 'GREAT_ACTION'], params: { room: 5 } };
     middleware.setProvider(ActionCableMockProvider);
     car = middleware.connect(mystore, 'MyChannel', options);
 
     ActionCableCalls.initialized();
     ActionCableCalls.connected();
-    mystore.dispatch({ type: 'CABLECAR_SENDING_TO_RAILS', payload: 'YES' });
+    mystore.dispatch({ type: 'GOOD_ACTION/SENDING_TO_RAILS', payload: 'YES' });
     mystore.dispatch({ type: 'SKIP_SERVER', payload: 'NO' });
+    mystore.dispatch({ type: 'GREAT_ACTION/TEST', payload: 'YES' });
     ActionCableCalls.received({
       type: 'CABLECAR_CHANGE_CHANNEL',
       newChannel: 'NewChannel',
@@ -129,8 +130,9 @@ describe('Integrated functionality -->', () => {
     mystore.dispatch({ type: 'NEW_SENDING_TO_RAILS_2', payload: 'YES' });
     mystore.dispatch({ type: 'CABLECAR_NOW_REDUX_ONLY', payload: 'YES' });
 
-    expect(loggedServerActions[0]).to.eq('CABLECAR_SENDING_TO_RAILS');
-    expect(loggedServerActions[1]).to.eq('NEW_SENDING_TO_RAILS_2');
+    expect(loggedServerActions[0]).to.eq('GOOD_ACTION/SENDING_TO_RAILS');
+    expect(loggedServerActions[1]).to.eq('GREAT_ACTION/TEST');
+    expect(loggedServerActions[2]).to.eq('NEW_SENDING_TO_RAILS_2');
 
     expect(loggedClientActions[0]).to.eq('CABLECAR_INITIALIZED');
     expect(loggedClientActions[1]).to.eq('CABLECAR_CONNECTED');

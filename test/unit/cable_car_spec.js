@@ -48,6 +48,11 @@ describe('CableCar', () => {
       const cc = new CableCar(mockCableProvider, mockStore, 'channel', { prefix: 'MY_PREFIX' });
       expect(cc.options.prefix).to.eq('MY_PREFIX');
     });
+    it('sets the prefix as a list', () => {
+      const cc = new CableCar(mockCableProvider, mockStore, 'channel', { prefix: ['MY_PREFIX1', 'MY_PREFIX2'] });
+      expect(cc.options.prefix).to.contain('MY_PREFIX1');
+      expect(cc.options.prefix).to.contain('MY_PREFIX2');
+    });
     it('sets the default prefix "RAILS" if no options are provided', () => {
       const cc = new CableCar(mockCableProvider, mockStore, 'channel');
       expect(cc.options.prefix).to.eq('RAILS');
