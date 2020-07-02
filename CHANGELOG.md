@@ -1,5 +1,8 @@
 # Change Log
 
+## JULY 2020
+### 3.0.10 - npm package updates
+
 ## JUNE 2020
 ### 3.0.9
 - `prefix` config option accepts list of strings for use w/ different action name conventions
