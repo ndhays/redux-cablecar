@@ -1,4 +1,3 @@
-
 export default class CableCarDispatcher {
 
   constructor(provider) {

@@ -6,6 +6,7 @@ let cableProvider;
 const dispatcher = new CableCarDispatcher();
 
 const middleware = store => next => (incomingAction) => {
+
   const action = incomingAction;
   let car;
 
