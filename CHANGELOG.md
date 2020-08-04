@@ -1,4 +1,6 @@
 # Change Log
+## AUGUST 2020
+### 3.0.11 - npm package updates
 
 ## JULY 2020
 ### 3.0.10 - npm package updates

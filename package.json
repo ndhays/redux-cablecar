@@ -3,13 +3,14 @@
   "engines": {
     "node": ">=12.16.1"
   },
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "Rails 6 ActionCable <-> Redux middleware",
   "main": "./build/redux-cablecar.js",
   "scripts": {
     "build": "npm run build-main; npm run build-min;",
     "build-main": "webpack --output-filename redux-cablecar.js --config webpack.config.js;",
     "build-min": "webpack --output-filename redux-cablecar.min.js --config webpack.config.js --optimize-minimize --devtool 'source-map';",
+    "publish": "npm publish",
     "prepublishOnly": "npm run build",
     "test": "mocha --recursive --require @babel/register",
     "watch": "webpack --output-filename redux-cablecar.js --config webpack.config.js --watch"
