@@ -1,2 +1,1 @@
-import middleware from "./src/middleware"
-export default middleware
+export { createCableCar } from './src/middleware'
