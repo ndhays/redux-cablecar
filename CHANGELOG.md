@@ -1,5 +1,8 @@
 # Changelog
 ## JANUARY 2021
+### 4.0.1
+- small bugfix
+- updates webpack, node packages, npm audit fix
 ### 4.0.0
 - rewrite using TypeScript and Redux toolkit best practices
 - **Breaking Changes**
