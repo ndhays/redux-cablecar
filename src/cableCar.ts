@@ -176,7 +176,11 @@ export default class CableCar {
                     let { type, meta, payload, ...rest } = action
                     let formattedAction = {
                         payload: { ...payload, ...rest },
-                        meta: { ...meta, [ACTION_META_FLAG]: true },
+                        meta: {
+                            ...meta,
+                            [ACTION_META_FLAG]: true,
+                            [ACTION_META_CHANNEL_FLAG]: this.channel,
+                        },
                         type: type || `${ACTION_PREFIX}/RECEIVED`,
                     }
                     dispatch(formattedAction)

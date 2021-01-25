@@ -153,7 +153,7 @@ describe('CableCar', () => {
             payload: { test: 'ing' },
         })
         let expectedAction = {
-            meta: { a: 1, __cablecar__: true },
+            meta: { a: 1, __cablecar__: true, __cablecarChannel__: 'channel' },
             payload: { test: 'ing' },
             type: 'server',
         }
