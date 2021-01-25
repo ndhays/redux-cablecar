@@ -1,5 +1,11 @@
 import actionCableProvider from 'actioncable'
-import { createAction, Action, Store } from '@reduxjs/toolkit'
+import {
+    createAction,
+    Action,
+    MiddlewareAPI,
+    Dispatch,
+    AnyAction,
+} from '@reduxjs/toolkit'
 import { getPermittedActionsFn } from './helpers'
 
 const ACTION_META_FLAG = '__cablecar__'
@@ -8,9 +14,12 @@ const ACTION_PREFIX = 'redux-cablecar'
 const DEFAULT_PERMITTED_ACTIONS_PREFIX = 'RAILS'
 
 /* ActionFilter Type Definition */
+export type CableCarStore = MiddlewareAPI<Dispatch<AnyAction>, any>
 export type CableCarActionFilter = (action: any) => boolean
-export type ActionWithMeta = Action & { meta: any }
-export type CableCarAction = Action & { meta: { __cablecar__: boolean } }
+// export type ActionWithMeta = Action & { meta: any }
+export type CableCarAction = Action & {
+    meta: { __cablecar__: boolean; __cablecarChannel__: string }
+}
 
 /* CableCarOptions Interface */
 export interface CableCarOptions {
@@ -77,14 +86,14 @@ export default class CableCar {
     }
 
     constructor(
-        store: Store,
+        store: CableCarStore,
         channel: string,
         options: CableCarOptions,
         destroyCallback?: () => void
     ) {
         this.channel = String(channel)
         this.options = options
-        this.subscription = this.initialize(
+        this.subscription = this._initialize(
             store,
             options.provider || actionCableProvider
         )
@@ -100,7 +109,11 @@ export default class CableCar {
         this.active = false
     }
 
-    permitsAction(action: ActionWithMeta) {
+    perform(method: string, payload: any) {
+        this.subscription.perform(method, payload)
+    }
+
+    permitsAction(action: AnyAction) {
         // avoid recursively dispatching backend <=> frontend actions
         let permitted = !(action.meta && action.meta[ACTION_META_FLAG])
 
@@ -114,11 +127,7 @@ export default class CableCar {
         this.subscription.send(action)
     }
 
-    perform(method: string, payload: any) {
-        this.subscription.perform(method, payload)
-    }
-
-    initialize(store: Store, provider: any) {
+    _initialize(store: CableCarStore, provider: any) {
         const consumer = provider.createConsumer(
             this.options.webSocketURL || null
         )

@@ -1,11 +1,13 @@
-import middleware from '../src/middleware'
+import { createCableCar } from '../src/middleware'
 import configureMockStore from 'redux-mock-store'
-import CableCar, { CableCarActionFilter } from '../src/cableCar'
+import { CableCarActionFilter } from '../src/cableCar'
 
 import { mockSend, mockChannels } from './__mocks__/actioncable'
 
 jest.mock('actioncable')
 
+const cableCar = createCableCar()
+const middleware = cableCar.createMiddleware()
 const middlewares = [middleware]
 const mockStore = configureMockStore(middlewares)
 const store = mockStore({})
@@ -13,14 +15,13 @@ const store = mockStore({})
 const consoleError = console.error
 
 describe('Middleware (integration)', () => {
-    let car: CableCar
     beforeEach(() => {
         console.error = jest.fn()
-        car = middleware.connect(store, 'channel', {})
+        cableCar.init(store, 'channel', {})
     })
     afterEach(() => {
         console.error = consoleError
-        car.destroy()
+        cableCar.destroy()
         store.clearActions()
     })
 
@@ -55,7 +56,10 @@ describe('Middleware (integration)', () => {
             const consoleSpy = jest.spyOn(console, 'error')
             store.dispatch(action1)
             expect(mockSend).toHaveBeenCalledTimes(0)
-            expect(consoleSpy).toHaveBeenCalledWith('CableCar: Dropped action.')
+            expect(consoleSpy).toHaveBeenCalledWith(
+                'CableCar: Dropped action.',
+                action1
+            )
         })
         it('handles dropped (optimistic) actions', () => {
             let action1 = { type: 'RAILS_act1', meta: { isOptimistic: true } }
@@ -63,7 +67,8 @@ describe('Middleware (integration)', () => {
             store.dispatch(action1)
             expect(mockSend).toHaveBeenCalledTimes(0)
             expect(consoleSpy).toHaveBeenCalledWith(
-                'CableCar: Dropped action. Action passed thru middleware (optimistic).'
+                'CableCar: Dropped action. Action passed thru middleware (optimistic).',
+                action1
             )
         })
 
@@ -81,23 +86,22 @@ describe('Middleware (integration)', () => {
     })
 
     describe('permitted actions', () => {
-        let car2: CableCar
         beforeEach(() => {
-            car.destroy()
+            cableCar.destroy()
         })
         afterEach(() => {
-            car2.destroy()
+            cableCar.destroy()
         })
 
         it('passes thru unpermitted actions to redux', () => {
-            car2 = middleware.connect(store, 'channel2', {})
+            cableCar.init(store, 'channel2', {})
             let action1 = { type: 'someaction' }
             store.dispatch(action1)
             expect(store.getActions()).toContain(action1)
         })
 
         it('permits actions properly (empty string)', () => {
-            car2 = middleware.connect(store, 'channel2', {
+            cableCar.init(store, 'channel2', {
                 permittedActions: '',
             })
             mockChannels['channel2'].initialized()
@@ -108,7 +112,7 @@ describe('Middleware (integration)', () => {
         })
 
         it('permits actions properly (prefix string)', () => {
-            car2 = middleware.connect(store, 'channel2', {
+            cableCar.init(store, 'channel2', {
                 permittedActions: 'PRE',
             })
             mockChannels['channel2'].initialized()
@@ -125,7 +129,7 @@ describe('Middleware (integration)', () => {
         })
 
         it('permits actions properly (list of strings/regexp)', () => {
-            car2 = middleware.connect(store, 'channel2', {
+            cableCar.init(store, 'channel2', {
                 permittedActions: ['EITHER', 'OR', /^YES/],
             })
             mockChannels['channel2'].initialized()
@@ -145,7 +149,7 @@ describe('Middleware (integration)', () => {
         })
 
         it('permits actions properly (RegExp)', () => {
-            car2 = middleware.connect(store, 'channel2', {
+            cableCar.init(store, 'channel2', {
                 permittedActions: /^START.+FINISH$/,
             })
             mockChannels['channel2'].initialized()
@@ -162,7 +166,7 @@ describe('Middleware (integration)', () => {
         })
 
         it('permits actions properly (function)', () => {
-            car2 = middleware.connect(store, 'channel2', {
+            cableCar.init(store, 'channel2', {
                 permittedActions: (a: CableCarActionFilter) =>
                     a['payload'] % 7 === 5,
             })

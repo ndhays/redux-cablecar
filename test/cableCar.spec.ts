@@ -199,4 +199,14 @@ describe('CableCar', () => {
         cc.permitsAction(action1)
         expect(mockPermit).toHaveBeenCalledWith(action1)
     })
+
+    it('silences dispatches w/ silent option', () => {
+        let cc = new CableCar(store, 'channel', {
+            silent: true,
+        })
+        mockChannels['channel'].initialized()
+        mockChannels['channel'].connected()
+        let action1 = { type: 'RAILS-test', meta: {} }
+        expect(store.getActions()).toEqual([])
+    })
 })

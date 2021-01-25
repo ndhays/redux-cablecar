@@ -1,4 +1,18 @@
-# Change Log
+# Changelog
+## JANUARY 2021
+### 4.0.0
+- rewrite using TypeScript and Redux toolkit best practices
+- **Breaking Changes**
+  - `prefix` option deprecated
+  - `permittedActions` option added
+  - new action type format:
+    - *redux-cablecar/INITIALIZED*
+    - *redux-cablecar/CONNECTED*
+    - *redux-cablecar/DISCONNECTED*
+    - *redux-cablecar/REJECTED*
+#### Permitted Actions (`permittedActions`)
+- can be string, RegExp, (string|RegExp)[], or function
+
 ## AUGUST 2020
 ### 3.0.11 - npm package updates
 
