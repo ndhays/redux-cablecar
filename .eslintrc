@@ -1,18 +1,11 @@
 {
   "extends": "airbnb",
   "env": {
-    "browser": true
+    "browser": true,
+    "jest/globals": true
   },
   "rules": {
     "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
   },
-  "globals"   : {
-    /* MOCHA */
-    "describe"   : false,
-    "it"         : false,
-    "before"     : false,
-    "beforeEach" : false,
-    "after"      : false,
-    "afterEach"  : false
-  }
+  "globals"   : {}
 }

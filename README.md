@@ -1,17 +1,17 @@
 # CableCar (redux-cablecar)
 
-[Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) to connect [Redux](http://redux.js.org/) to [Rails ActionCable](http://edgeguides.rubyonrails.org/action_cable_overview.html).  
+Redux CableCar is [Redux middleware](http://redux.js.org/docs/api/applyMiddleware.html) connecting [Redux](http://redux.js.org/) actions to [Rails Action Cable](http://edgeguides.rubyonrails.org/action_cable_overview.html). It uses Action Cable's websocket connection to automatically pass specific redux actions from the client to the server, and converts messages coming from the server into client-side redux actions.
 
-Uses a websocket connection to flow redux actions between the client and the server.  
+[![npm version](https://img.shields.io/npm/v/redux-cablecar.svg?style=flat-square)](https://www.npmjs.com/package/redux-cablecar)
+[![npm downloads](https://img.shields.io/npm/dm/redux-cablecar.svg?style=flat-square)](https://www.npmjs.com/package/redux-cablecar)
 
-[Demo App](https://github.com/ndhays/redux-cablecar-Rails-Demo-App)
 
 # Installation
 `npm install redux-cablecar --save`
 
 # Usage
-1. Apply `cablecar` as a redux middleware
-2. Connect the cablecar middleware to the redux store
+## Add `cablecar` to list of redux middleware
+## Connect the cablecar middleware to the redux store
 
 ## #setProvider(actionCableProvider) *optional*
 By default the Rails 'actionprovider' package is used, but it can be passed into the middleware as well. It must be set before calling #connect.
