@@ -3,6 +3,7 @@
 ### 4.0.0
 - rewrite using TypeScript and Redux toolkit best practices
 - **Breaking Changes**
+  - new import `{ createCableCar }`
   - `prefix` option deprecated
   - `permittedActions` option added
   - new action type format:
