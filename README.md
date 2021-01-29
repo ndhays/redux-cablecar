@@ -100,7 +100,7 @@ cableCar.init(store, 'channelName', {
 The CableCar object has the following other functions:
 
 ## #destroy
-Disconnects and destroys cablecar. This is useful if trying to connect multiple cars to different channels simultaneously.
+Disconnects and destroys cablecar. This is useful if changing channels/params.
 ```js6
 const cableCar = createCableCar()
 
