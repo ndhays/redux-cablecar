@@ -1,53 +1,48 @@
-import { Middleware, Store } from '@reduxjs/toolkit'
-import CableCar, { CableCarOptions } from './cableCar'
+import CableCar from './cableCar'
+import CableCarRoute from './cableCarRoute'
+import { Middleware } from '@reduxjs/toolkit'
 
-export type CableCarApi = {
-    createMiddleware: () => Middleware
-    init: (store: Store, channel: string, options: CableCarOptions) => void
-    destroy: () => void
-    perform: (method: string, action: any) => void
-    send: (action: any) => void
-}
+/* CableCarMiddleware Class */
+export default function createMiddleware(route: CableCarRoute): Middleware {
+    return (store) => (next) => (action) => {
+        // only look at active cable cars w/ matching permitted actions
+        const relevantCars = route.cars.filter(
+            (car) => car.active && car.permitsAction(action)
+        )
+        let serverOnlyAction = false
 
-export function createCableCar(): CableCarApi {
-    let car: null | CableCar = null
+        if (relevantCars.length) {
+            serverOnlyAction = relevantCars.reduce(
+                (oneWay: boolean, car: CableCar) => {
+                    const { meta } = action
 
-    let middleware: Middleware = (store) => (next) => (action) => {
-        let passActionAlong = true
+                    // if car is connected send action to server
+                    if (car.connected) {
+                        car.send(action)
+                        // if sent action is optimistic send thru to redux as well
+                        if (oneWay && meta?.isOptimistic) {
+                            oneWay = false
+                        }
+                    } else {
+                        // if a permitted action fails, optimism takes precedence
+                        if (meta?.isOptimistic || meta?.isOptimisticOnFail) {
+                            oneWay = false
+                        }
 
-        // runs through logic if action is permitted
-        if (car?.permitsAction(action)) {
-            let meta = action.meta || {}
-            if (car.active) {
-                passActionAlong = meta.isOptimistic
-                car.send(action)
-            } else {
-                passActionAlong = meta.isOptimistic || meta.isOptimisticOnFail
-                console.error(
-                    'CableCar: Dropped action.' +
-                        (passActionAlong
-                            ? ' Action passed thru middleware (optimistic).'
-                            : ''),
-                    action
-                )
-            }
+                        console.error(
+                            `CableCar channel: ${car.channel} Dropped action.` +
+                                (oneWay
+                                    ? ''
+                                    : ' Action passed thru middleware to Redux (optimistic).'),
+                            action
+                        )
+                    }
+                    return oneWay
+                },
+                true
+            )
         }
 
-        return passActionAlong ? next(action) : store.getState()
-    }
-
-    return {
-        createMiddleware: () => middleware,
-        // CableCar Object api
-        init: (store, channel, options) => {
-            car = new CableCar(store, channel, options)
-        },
-        destroy: () => {
-            car?.destroy()
-            car = null
-        },
-        perform: (method: string, payload: any) =>
-            car?.perform(method, payload),
-        send: (action: any) => car?.send(action),
+        return serverOnlyAction ? store.getState() : next(action)
     }
 }

@@ -1,5 +1,16 @@
 # Changelog
 ## JANUARY 2021
+### 5.0.0
+- redesign to include more functionality
+- multiple channels
+- cleaner code
+- separates provider, ws url from other logic
+- adds 'channel' meta property by default
+- adds 'matchChannel' option for permitting actions
+- matches on channel by default
+- **Breaking Changes**
+  - new import `{ createCableCarRoute }`
+
 ### 4.0.1
 - small bugfix
 - updates webpack, node packages, npm audit fix

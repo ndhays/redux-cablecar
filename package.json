@@ -1,9 +1,9 @@
 {
   "name": "redux-cablecar",
   "engines": {
-    "node": ">=12.16.1"
+    "node": "15.x"
   },
-  "version": "4.0.1",
+  "version": "5.0.0",
   "description": "Rails 6 ActionCable <-> Redux middleware",
   "main": "./build/redux-cablecar.js",
   "scripts": {
@@ -59,7 +59,7 @@
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
-    "actioncable": "^5.2.1",
+    "actioncable": "^5.2.4",
     "redux": "^4.0.5"
   }
 }

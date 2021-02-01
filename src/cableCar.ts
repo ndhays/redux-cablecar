@@ -1,15 +1,15 @@
-import actionCableProvider from 'actioncable'
 import {
     createAction,
     Action,
     MiddlewareAPI,
     Dispatch,
     AnyAction,
+    Store,
 } from '@reduxjs/toolkit'
 import { getPermittedActionsFn } from './helpers'
 
 const ACTION_META_FLAG = '__cablecar__'
-const ACTION_META_CHANNEL_FLAG = '__cablecarChannel__'
+const ACTION_META_CHANNEL_FLAG = 'channel'
 const ACTION_PREFIX = 'redux-cablecar'
 const DEFAULT_PERMITTED_ACTIONS_PREFIX = 'RAILS'
 
@@ -24,14 +24,13 @@ export type CableCarAction = Action & {
 /* CableCarOptions Interface */
 export interface CableCarOptions {
     params?: any
+    matchChannel?: boolean
     permittedActions?:
         | string
         | RegExp
         | CableCarActionFilter
         | (string | RegExp)[]
-    provider?: any
     silent?: boolean
-    webSocketURL?: string
     // callbacks
     initialized?: () => void
     connected?: () => void
@@ -42,9 +41,14 @@ export interface CableCarOptions {
 
 /* CableCar Class */
 export default class CableCar {
-    active: boolean = false
+    consumer: any
+    store: Store
     channel: string
+
+    active: boolean = false
+    connected: boolean = false
     subscription: any
+
     private _options: CableCarOptions = {}
     private _permittedActionFn: CableCarActionFilter = () => true
     private _destroyCallback
@@ -71,10 +75,8 @@ export default class CableCar {
         const options: CableCarOptions = {
             params: opts.params || {},
             silent: opts.silent ? true : false,
+            matchChannel: opts.matchChannel ? true : false,
         }
-
-        // set optional options
-        if (opts.webSocketURL) options.webSocketURL = opts.webSocketURL
 
         // set optional callbacks
         if (opts.initialized) options.initialized = opts.initialized
@@ -86,53 +88,78 @@ export default class CableCar {
     }
 
     constructor(
-        store: CableCarStore,
+        consumer: any,
+        store: Store,
         channel: string,
-        options: CableCarOptions,
+        options?: CableCarOptions,
         destroyCallback?: () => void
     ) {
+        this.consumer = consumer
+        this.store = store
         this.channel = String(channel)
-        this.options = options
-        this.subscription = this._initialize(
-            store,
-            options.provider || actionCableProvider
-        )
+        this.options = options || {}
+        this.subscription = this.init()
         this._destroyCallback = destroyCallback
     }
 
+    // public api
+
     destroy() {
-        if (this.active) this.subscription.unsubscribe()
+        if (this.connected) this.subscription.unsubscribe()
         if (this._destroyCallback) {
             this._destroyCallback()
             this._destroyCallback = undefined
         }
         this.active = false
+        this.connected = false
     }
 
+    // call server method directly
     perform(method: string, payload: any) {
+        this.isReady()
         this.subscription.perform(method, payload)
     }
+
+    // if action is valid, send to Rails via ActionCable Subscription
+    send(action: any) {
+        this.isReady()
+        this.subscription.send(action)
+    }
+
+    pause() {
+        this.active = false
+    }
+
+    resume() {
+        this.active = true
+    }
+
+    // public
 
     permitsAction(action: AnyAction) {
         // avoid recursively dispatching backend <=> frontend actions
         let permitted = !(action.meta && action.meta[ACTION_META_FLAG])
+
+        // match channel if given
+        if (
+            this.options.matchChannel &&
+            permitted &&
+            action.meta &&
+            action.meta[ACTION_META_CHANNEL_FLAG] &&
+            action.meta[ACTION_META_CHANNEL_FLAG] != this.channel
+        )
+            return false
 
         // use permitted function to filter valid backend actions
         if (permitted) permitted = this._permittedActionFn(action)
         return permitted
     }
 
-    // if action is valid, send to Rails via ActionCable Subscription
-    send(action: any) {
-        this.subscription.send(action)
-    }
+    // private
 
-    _initialize(store: CableCarStore, provider: any) {
-        const consumer = provider.createConsumer(
-            this.options.webSocketURL || null
-        )
+    init() {
         const dispatch = (action: Action) => {
-            if (store && !this.options.silent) store.dispatch(action)
+            if (this.store && !this.options.silent) this.store.dispatch(action)
         }
         const createGenericAction = (actionType: string) => {
             return createAction(actionType, () => ({
@@ -144,27 +171,28 @@ export default class CableCar {
             }))()
         }
 
-        return consumer.subscriptions.create(
+        return this.consumer.subscriptions.create(
             {
                 channel: this.channel,
                 ...this.options.params,
             },
             {
                 initialized: () => {
+                    this.active = true
                     dispatch(createGenericAction(`${ACTION_PREFIX}/INIT`))
                     if (this.options.initialized) {
                         this.options.initialized()
                     }
                 },
                 connected: () => {
-                    this.active = true
+                    this.connected = true
                     dispatch(createGenericAction(`${ACTION_PREFIX}/CONNECTED`))
                     if (this.options.connected) {
                         this.options.connected()
                     }
                 },
                 disconnected: () => {
-                    this.active = false
+                    this.connected = false
                     dispatch(
                         createGenericAction(`${ACTION_PREFIX}/DISCONNECTED`)
                     )
@@ -185,18 +213,28 @@ export default class CableCar {
                     }
                     dispatch(formattedAction)
                 },
-                rejected: () => {
+                rejected: (err: any) => {
                     this.active = false
+                    this.connected = false
                     dispatch(createGenericAction(`${ACTION_PREFIX}/REJECTED`))
                     if (this.options.rejected) {
                         this.options.rejected()
                     } else {
                         console.error(
-                            `CableCar: connection rejected. (Channel: ${this.channel})`
+                            `CableCar: connection rejected. (Channel: ${this.channel}) ${err}`
                         )
                     }
                 },
             }
         )
+    }
+
+    isReady() {
+        if (!this.connected)
+            throw new TypeError(
+                `CableCar channel: ${this.channel} is disconnected.`
+            )
+        if (!this.active)
+            throw new TypeError(`CableCar channel: ${this.channel} is paused.`)
     }
 }

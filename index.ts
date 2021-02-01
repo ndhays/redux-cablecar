@@ -1,1 +1,1 @@
-export { createCableCar } from './src/middleware'
+export { createCableCarRoute } from './src/api'
