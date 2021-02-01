@@ -1,6 +1,6 @@
 # Changelog
 ## JANUARY 2021
-### 5.0.1
+### 5.0.1, 5.0.2
 - change from npm to yarn
 ### 5.0.0
 - redesign to include more functionality
