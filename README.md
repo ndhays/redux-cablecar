@@ -209,7 +209,7 @@ Pull requests welcome.
 
 # See Also
 - [react-actioncable-provider](https://github.com/cpunion/react-actioncable-provider#readme)
-- [ActionCable Overview](https://guides.rubyonrails.org/action_cable_overview.html
+- [ActionCable Overview](https://guides.rubyonrails.org/action_cable_overview.html)
 - [react-use-actioncable](https://github.com/ndhays/react-use-actioncable)
 - [actioncable-vue](https://github.com/mclintprojects/actioncable-vue)
 
