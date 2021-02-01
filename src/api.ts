@@ -24,7 +24,11 @@ export type CableCarApi = {
 }
 
 const dispatcher = new CableCarDispatcher()
-
+if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', () => {
+        dispatcher.unsubscribeAll()
+    })
+}
 export function createCableCarRoute(
     routeOptions: CableCarRouteOptions = {}
 ): CableCarRouteApi {

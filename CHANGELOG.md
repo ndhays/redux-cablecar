@@ -1,5 +1,7 @@
 # Changelog
 ## JANUARY 2021
+### 5.0.1
+- change from npm to yarn
 ### 5.0.0
 - redesign to include more functionality
 - multiple channels

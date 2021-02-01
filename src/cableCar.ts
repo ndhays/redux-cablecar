@@ -105,13 +105,14 @@ export default class CableCar {
     // public api
 
     destroy() {
-        if (this.connected) this.subscription.unsubscribe()
+        this.active = false
+        this.connected = false
+        this.subscription?.unsubscribe()
+        this.subscription = null
         if (this._destroyCallback) {
             this._destroyCallback()
             this._destroyCallback = undefined
         }
-        this.active = false
-        this.connected = false
     }
 
     // call server method directly

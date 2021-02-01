@@ -12,4 +12,14 @@ export default class CableCarDispatcher {
         }
         return this.consumers[key]
     }
+
+    unsubscribeAll() {
+        Object.values(this.consumers).forEach((consumer) => {
+            consumer?.subscriptions?.subscriptions?.forEach(
+                (subscription: any) => {
+                    subscription?.unsubscribe()
+                }
+            )
+        })
+    }
 }
