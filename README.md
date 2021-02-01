@@ -138,6 +138,7 @@ const cableCarRoute = createCableCarRoute()
 ```
 ```js6
 const cableCar = cableCarRoute.connect(store, 'GameChannel', { params: { room: 1 }})
+```
 ```js6
 cableCar.destroy()
 cableCarRoute.connect(store, 'GameChannel', { params: { room: 2 }})
@@ -178,7 +179,7 @@ Redux actions matching the `permittedActions` criteria get sent to the Rails ser
 However if `isOptimistic: true` is in the action meta property, then the action will be sent to both the Rails Server, as well as being propagated thru the rest of the Redux middlewares. These actions are considered 'optimistic' updates, since when news comes back from the server it may conflict with changes that have already been made on the client.
   
 Example:
-```
+```js6
 { type: 'RAILS_ACTION_ALSO_REDUX_SAME_TIME', meta: { isOptimistic: true }}
 ```
 
@@ -187,7 +188,7 @@ Dropped actions are permitted actions that cannot be sent with the ActionCable s
 
 ## Optimistic on Fail
 Dropped actions are usually a sign of a timing issue that needs to be resolved, but if necessary a meta property `isOptimisticOnFail` can be added to an action. These actions will be passed to redux only if dropped.
-```
+```js6
 { type: 'RAILS_SERVER_OR_REDUX_IF_DROPPED', meta: { isOptimisticOnFail: true }}
 ```
 
