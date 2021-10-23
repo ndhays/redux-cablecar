@@ -6,7 +6,9 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "build"),
     library: "cablecar",
-    libraryTarget: "commonjs2",
+    libraryTarget: "umd",
+    globalObject: 'this',
+    umdNamedDefine: true
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".json"],

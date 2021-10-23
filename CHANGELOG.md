@@ -1,6 +1,6 @@
 # Changelog
 ## OCTOBER 2021
-### 5.0.4
+### 5.0.3 - 5.0.5
 - npm audit fix
 - removes node engine version
 ## JANUARY 2021
