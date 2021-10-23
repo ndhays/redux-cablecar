@@ -1,4 +1,8 @@
 # Changelog
+## OCTOBER 2021
+### 5.0.4
+- npm audit fix
+- removes node engine version
 ## JANUARY 2021
 ### 5.0.1, 5.0.2
 - change from npm to yarn
