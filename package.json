@@ -1,6 +1,6 @@
 {
   "name": "redux-cablecar",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "description": "Rails 6 ActionCable <-> Redux middleware",
   "main": "./build/redux-cablecar.js",
   "scripts": {
