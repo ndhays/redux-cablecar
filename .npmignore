@@ -5,3 +5,6 @@ test
 webpack.config.js
 yarn.lock
 .DS_Store
+babel.config.js
+jest.config.ts
+tsconfig.json
