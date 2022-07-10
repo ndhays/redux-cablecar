@@ -51,8 +51,8 @@ end
   
 # CableCarRoute
 ## createCableCarRoute(options)
-- `provider` - custom provider (not necessary)
-- `webSocketURL` - custom WS url (not necessary)
+- `provider` - custom provider (optional)
+- `webSocketURL` - custom WS url (optional)
   
 ```js6
 createCableCarRoute({
