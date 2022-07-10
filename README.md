@@ -72,9 +72,8 @@ Name of the ActionCable channel (ie. 'ChatChannel').
 - `params` - *object* sent to ActionCable channel (ie. `params[:room]`)  
 - `permittedActions` - *string, RegExp, (string|RegExp)[], function* - filters actions that get sent to the server
 - `matchChannel` - *boolean* optional shortcut for using multiple channels
-- `silent` - *boolean* creates one-way communication to Rails (filtered client actions get sent to the server, but no server messages will dispatch redux actions) 
-
-### options - ActionCable Callbacks
+- `silent` - *boolean* creates one-way communication to Rails (filtered client actions get sent to the server, but no server messages will dispatch redux actions)
+##### options - ActionCable Callbacks
 - `initialized`
 - `connected`
 - `disconnected`
