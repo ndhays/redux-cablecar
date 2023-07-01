@@ -5,9 +5,8 @@ Redux CableCar is [Redux middleware](http://redux.js.org/docs/api/applyMiddlewar
 [![npm version](https://img.shields.io/npm/v/redux-cablecar.svg?style=flat-square)](https://www.npmjs.com/package/redux-cablecar)
 [![npm downloads](https://img.shields.io/npm/dm/redux-cablecar.svg?style=flat-square)](https://www.npmjs.com/package/redux-cablecar)
 
-# NOTE! Before Using Redux Cablecar Take a Look at these Packages...
-- [react-actioncable-provider](https://github.com/cpunion/react-actioncable-provider#readme)
-- [ActionCable Overview](https://guides.rubyonrails.org/action_cable_overview.html)
+# NOTE! Take a Look at these other Packages first...
+If you are using a Javascript framework like React or Vue, these might be simpler approaches:  
 - [react-use-actioncable](https://github.com/ndhays/react-use-actioncable)
 - [actioncable-vue](https://github.com/mclintprojects/actioncable-vue)
 
