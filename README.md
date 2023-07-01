@@ -8,7 +8,8 @@ Redux CableCar is [Redux middleware](http://redux.js.org/docs/api/applyMiddlewar
 # NOTE! Take a Look at these other Packages first...
 If you are using a Javascript framework like React or Vue, these might be simpler approaches:  
 - [react-use-actioncable](https://github.com/ndhays/react-use-actioncable)
-- [actioncable-vue](https://github.com/mclintprojects/actioncable-vue)
+- [actioncable-vue](https://github.com/mclintprojects/actioncable-vue) - still maintained?
+- [react-actioncable-provider](https://github.com/cpunion/react-actioncable-provider) - not maintained?
 
 # Installation
 ```js6
